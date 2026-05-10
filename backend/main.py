@@ -13,7 +13,7 @@ app = FastAPI(
 # During development: allow all. In production: restrict to your Vercel URL.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],  # Change to ['https://your-app.vercel.app'] in production
+    allow_origins=['https://carbon-wise-sl.vercel.app/'],  # Change to ['https://your-app.vercel.app'] in production
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
