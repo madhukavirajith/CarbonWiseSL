@@ -1,42 +1,52 @@
 // frontend/src/App.js
-import React, { useState } from 'react';
-import ApplianceForm from './components/ApplianceForm';
-import Dashboard from './components/Dashboard';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
+import AppPage from './pages/AppPage';
+import ResultsPage from './pages/ResultsPage';
+import SolarPage from './pages/SolarPage';
+import HistoryPage from './pages/HistoryPage';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+
+export const AppContext = React.createContext(null);
+
 function App() {
- const [results, setResults] = useState(null);
- return (
- <div style={{ fontFamily:'Calibri, sans-serif',
- minHeight:'100vh', background:'#F4F6F8' }}>
- {/* Header */}
- <header style={{ background:'#1B2A4A', color:'white',
- padding:'16px 24px', display:'flex',
- alignItems:'center', gap:12 }}>
- <span style={{ fontSize:24, fontWeight:'bold' }}>
- CarbonWise SL
- </span>
- <span style={{ color:'#B2DDE0', fontSize:14 }}>
- AI-Powered Electricity Carbon Tracker for Sri Lanka
- </span>
- </header>
- {/* Main content */}
- <main style={{ padding:'32px 16px' }}>
- {!results ? (
- <ApplianceForm onResults={setResults} />
- ) : (
- <>
- <Dashboard results={results} />
- <div style={{ textAlign:'center', marginTop:24 }}>
- <button onClick={() => setResults(null)}
- style={{ background:'#0D7680', color:'white',
- padding:'10px 24px', border:'none',
-borderRadius:8, cursor:'pointer' }}>
- Calculate Again
- </button>
- </div>
- </>
- )}
- </main>
- </div>
- );
+    const [formData, setFormData] = useState(null);
+    const [results, setResults] = useState(null);
+    const [userId, setUserId] = useState(() => {
+        return localStorage.getItem('cw_uid') || `user_${Date.now()}`;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('cw_uid', userId);
+    }, [userId]);
+
+    const resetAll = () => {
+        setFormData(null);
+        setResults(null);
+    };
+
+    return (
+        <AppContext.Provider value={{ formData, setFormData, results, setResults, userId, resetAll }}>
+            <BrowserRouter>
+                <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                    <Navbar />
+                    <main style={{ flex: 1 }}>
+                        <Routes>
+                            <Route path="/" element={<LandingPage />} />
+                            <Route path="/calculate" element={<AppPage />} />
+                            <Route path="/results" element={results ? <ResultsPage /> : <Navigate to="/calculate" />} />
+                            <Route path="/solar" element={<SolarPage />} />
+                            <Route path="/history" element={<HistoryPage />} />
+                            <Route path="*" element={<Navigate to="/" />} />
+                        </Routes>
+                    </main>
+                    <Footer />
+                </div>
+            </BrowserRouter>
+        </AppContext.Provider>
+    );
 }
+
 export default App;

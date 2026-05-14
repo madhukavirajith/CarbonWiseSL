@@ -1,0 +1,16 @@
+# backend/.dockerignore
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+.git
+.gitignore
+*.md
+.DS_Store
+.pytest_cache/
+*.egg-info/
+dist/
+build/

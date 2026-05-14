@@ -1,63 +1,81 @@
 # backend/routers/simulate.py
-from fastapi import APIRouter
+import copy
+from fastapi import APIRouter, HTTPException
 from schemas import SimulationInput, SimulationOutput
 import models_loader as ml
 import numpy as np
-import copy
 
 router = APIRouter()
 
-SCENARIO_DESCRIPTIONS = {
-    'ac_temp': 'Set AC temperature to {val}°C',
-    'ac_hours': 'Reduce AC to {val} hours/day',
-    'led': 'Replace all old bulbs with {val} LEDs',
-    'washer_shift': 'Reduce washing to {val} loads/week',
-    'standby': 'Eliminate standby — turn off {val} devices fully'
+SCENARIO_META = {
+    "ac_temp":      ("Set AC to {val}°C",           "Cooling"),
+    "ac_hours":     ("Reduce AC to {val} hrs/day",  "Cooling"),
+    "led_upgrade":  ("Replace all old bulbs with LED", "Lighting"),
+    "washer_shift": ("Reduce washing to {val} loads/week", "Appliances"),
+    "standby":      ("Eliminate standby power from {val} devices", "Standby"),
 }
 
-@router.post('/simulate', response_model=SimulationOutput)
+@router.post("/simulate", response_model=SimulationOutput)
 def simulate(data: SimulationInput):
     """
-    What-if simulation: predict CO2 change when user modifies
-    one specific behaviour.
+    What-if simulation: predict CO2 and cost delta when the user
+    makes one specific behavioural change.
     """
-    base = data.base
+    if ml.xgb_model is None:
+        raise HTTPException(503, "XGBoost model not loaded.")
+
+    base     = data.base
     modified = copy.deepcopy(base)
-    
-    # Apply the scenario change
-    if data.scenario == 'ac_temp':
-        modified.ac_temp = data.new_value
-    elif data.scenario == 'ac_hours':
-        modified.ac_hours = data.new_value
-    elif data.scenario == 'led':
-        modified.led_count = int(modified.led_count + modified.old_bulb_count)
-        modified.old_bulb_count = 0
-    elif data.scenario == 'washer_shift':
-        modified.washer_loads = data.new_value
-    elif data.scenario == 'standby':
-        modified.computer_hours = max(0, modified.computer_hours - 2)
-        modified.tv_hours = max(0, modified.tv_hours - 1)
-        
-    # Predict both
+
+    sc = data.scenario
+    nv = data.new_value
+
+    if sc == "ac_temp":
+        modified.ac_temp = int(nv)
+    elif sc == "ac_hours":
+        modified.ac_hours = max(0.0, float(nv))
+    elif sc == "led_upgrade":
+        total = modified.led_count + modified.old_bulb_count + modified.tube_light_count
+        modified.led_count       = total
+        modified.old_bulb_count  = 0
+        modified.tube_light_count= 0
+    elif sc == "washer_shift":
+        modified.washer_loads = max(0.0, float(nv))
+    elif sc == "standby":
+        # Eliminating standby — reduce computer and TV hours slightly
+        modified.computer_hours = max(0.0, modified.computer_hours - 1.0)
+        modified.tv_hours       = max(0.0, modified.tv_hours - 0.5)
+
     X_orig = np.array([ml.input_to_features(base)])
-    X_mod = np.array([ml.input_to_features(modified)])
-    
+    X_mod  = np.array([ml.input_to_features(modified)])
+
     orig_co2 = float(ml.xgb_model.predict(X_orig)[0])
-    new_co2 = float(ml.xgb_model.predict(X_mod)[0])
-    
-    co2_saving = orig_co2 - new_co2
-    
-    # Rough LKR saving: 1 kWh ~ LKR 10 at mid-tariff
-    kwh_saving = co2_saving / ml.SL_EMISSION_FACTOR
-    cost_saving = kwh_saving * 10.0
-    
-    desc = SCENARIO_DESCRIPTIONS.get(data.scenario, data.scenario)
-    desc = desc.replace('{val}', str(data.new_value))
-    
+    new_co2  = float(ml.xgb_model.predict(X_mod)[0])
+
+    saving_day   = orig_co2 - new_co2
+    saving_month = saving_day * 30
+    kwh_saving   = saving_day / ml.SL_EMISSION_FACTOR
+    cost_saving  = kwh_saving * 10.0 * 30   # LKR per month approx
+    saving_pct   = round(saving_day / (orig_co2 + 1e-9) * 100, 1)
+
+    if saving_pct > 20:
+        impact = "High Impact"
+    elif saving_pct > 8:
+        impact = "Medium Impact"
+    else:
+        impact = "Low Impact"
+
+    meta  = SCENARIO_META.get(sc, ("{val}", "General"))
+    desc  = meta[0].replace("{val}", str(nv))
+
     return SimulationOutput(
-        original_co2=round(orig_co2, 3),
-        new_co2=round(new_co2, 3),
-        co2_saving_kg=round(co2_saving, 3),
-        cost_saving_lkr=round(cost_saving, 2),
-        scenario_description=desc
+        scenario             = sc,
+        original_co2         = round(orig_co2, 3),
+        new_co2              = round(new_co2, 3),
+        co2_saving_kg_day    = round(saving_day, 3),
+        co2_saving_kg_month  = round(saving_month, 2),
+        cost_saving_lkr_month= round(cost_saving, 2),
+        co2_saving_pct       = saving_pct,
+        description          = desc,
+        impact_label         = impact,
     )
