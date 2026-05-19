@@ -188,3 +188,19 @@ class HealthOutput(BaseModel):
     status:  str
     models:  Dict[str, bool]
     version: str
+
+# ── AUTHENTICATION SCHEMAS ────────────────────────────────────────────────
+class UserSignupInput(BaseModel):
+    username: str = Field(..., min_length=3, max_length=50)
+    email:    str = Field(...)
+    password: str = Field(..., min_length=6)
+
+class UserLoginInput(BaseModel):
+    email:    str = Field(...)
+    password: str = Field(...)
+
+class AuthResponse(BaseModel):
+    user_id:  str
+    username: str
+    email:    str
+    token:    str

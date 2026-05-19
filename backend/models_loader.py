@@ -134,7 +134,7 @@ def get_ceb_cost(units: float) -> float:
 
 
 def input_to_features(data) -> list:
-    """Convert ApplianceInput Pydantic model to ordered feature list (19 features)."""
+    """Convert ApplianceInput Pydantic model to ordered feature list (34 features)."""
     city_enc = 0
     if city_encoder is not None:
         try:
@@ -143,25 +143,40 @@ def input_to_features(data) -> list:
             city_enc = 0
 
     row = [
-        data.occupants,
-        data.ceb_units,
-        data.has_ac,
-        data.ac_hours,
-        data.ac_temp,
-        data.has_fridge,
-        data.has_heater,
-        data.heater_hours,
-        data.num_fans,
-        data.fan_hours,
-        data.num_tvs,
-        data.tv_hours,
-        data.has_washer,
-        data.washer_loads,
-        data.led_count,
-        data.old_bulb_count,
-        data.has_computer,
-        data.computer_hours,
-        city_enc,
+        float(data.occupants),
+        float(data.ceb_units),
+        float(data.has_ac),
+        float(data.ac_rooms),
+        float(data.ac_hours),
+        float(data.ac_temp),
+        float(data.has_fridge),
+        float(FRIDGE_KWH.get(data.fridge_size, 2.88)),
+        float(data.has_heater),
+        float(HEATER_KW.get(data.heater_type, 0.0)),
+        float(data.heater_hours),
+        float(data.num_fans),
+        float(data.fan_hours),
+        float(data.num_tvs),
+        float(TV_KW.get(data.tv_type, 0.070)),
+        float(data.tv_hours),
+        float(data.has_washer),
+        float(data.washer_loads),
+        float(data.led_count),
+        float(data.old_bulb_count),
+        float(data.tube_light_count),
+        float(data.light_hours),
+        float(data.has_computer),
+        float(PC_KW.get(data.computer_type, 0.045)),
+        float(data.computer_hours),
+        float(data.has_rice_cooker),
+        float(data.rice_cooker_uses),
+        float(data.has_microwave),
+        float(data.microwave_hours),
+        float(data.has_iron),
+        float(data.iron_hours_week),
+        float(data.has_solar),
+        float(data.solar_kw),
+        float(city_enc),
     ]
     return row
 

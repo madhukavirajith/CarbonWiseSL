@@ -28,3 +28,5 @@ export const simulate = (d) => api.post('/api/simulate', d);
 export const solarRoi = (d) => api.post('/api/solar', d);
 export const saveHistory = (d) => api.post('/api/history/save', d);
 export const getHistory = (uid) => api.get(`/api/history/${uid}`);
+export const signupUser = (d) => api.post('/api/auth/signup', d);
+export const loginUser = (d) => api.post('/api/auth/login', d);

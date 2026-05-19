@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 import time
 import logging
 
-from routers import predict, explain, cluster, simulate, solar, history, health
+from routers import predict, explain, cluster, simulate, solar, history, health, auth
 
 # ── Logging ───────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -74,6 +74,7 @@ app.include_router(cluster.router,  prefix="/api", tags=["Clustering"])
 app.include_router(simulate.router, prefix="/api", tags=["Simulation"])
 app.include_router(solar.router,    prefix="/api", tags=["Solar ROI"])
 app.include_router(history.router,  prefix="/api", tags=["History"])
+app.include_router(auth.router,     prefix="/api", tags=["Authentication"])
 
 @app.get("/", tags=["Root"])
 def root():

@@ -1,6 +1,7 @@
 // frontend/src/components/Navbar.js
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { AppContext } from '../App';
 
 const S = {
     nav: (scrolled) => ({
@@ -45,11 +46,29 @@ const S = {
         transition: 'transform 0.2s, box-shadow 0.2s',
         textDecoration: 'none',
     },
+    usernameText: {
+        fontSize: 14,
+        fontWeight: 600,
+        color: '#B2DDE0',
+    },
+    logoutBtn: {
+        padding: '6px 12px',
+        borderRadius: 8,
+        fontSize: 13,
+        fontWeight: 600,
+        background: 'rgba(255, 255, 255, 0.08)',
+        color: 'rgba(255, 255, 255, 0.8)',
+        border: '1px solid rgba(255, 255, 255, 0.15)',
+        cursor: 'pointer',
+        transition: 'all 0.2s',
+    },
 };
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const location = useLocation();
+    const navigate = useNavigate();
+    const { user, logout } = useContext(AppContext);
 
     useEffect(() => {
         const handler = () => setScrolled(window.scrollY > 20);
@@ -72,7 +91,25 @@ export default function Navbar() {
                     <Link to="/calculate" style={S.link(path === '/calculate')}>Calculate</Link>
                     <Link to="/solar" style={S.link(path === '/solar')}>Solar ROI</Link>
                     <Link to="/history" style={S.link(path === '/history')}>History</Link>
-                    <Link to="/calculate" style={S.cta}>Get Started →</Link>
+                    
+                    {user ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 8 }}>
+                            <span style={S.usernameText}>👤 {user.username}</span>
+                            <button 
+                                onClick={() => { logout(); navigate('/'); }} 
+                                style={S.logoutBtn}
+                                onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(192, 57, 43, 0.2)'; e.currentTarget.style.borderColor = 'rgba(192, 57, 43, 0.4)'; e.currentTarget.style.color = '#FF8A80'; }}
+                                onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'; e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)'; e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)'; }}
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 8 }}>
+                            <Link to="/auth" style={S.link(path === '/auth')}>Sign In</Link>
+                            <Link to="/calculate" style={S.cta}>Get Started →</Link>
+                        </div>
+                    )}
                 </div>
             </div>
         </nav>

@@ -7,8 +7,9 @@ import numpy as np
 router = APIRouter()
 
 CLUSTER_FEATURES_ORDER = [
-    "daily_kwh", "has_ac", "ac_hours",
-    "has_heater", "heater_hours", "num_fans", "occupants"
+    "daily_kwh", "has_ac", "ac_hours", "ac_rooms",
+    "has_heater", "heater_hours", "num_fans", "fan_hours",
+    "has_washer", "washer_loads", "occupants", "has_solar"
 ]
 
 @router.post("/cluster", response_model=ClusterOutput)
@@ -24,12 +25,17 @@ def get_cluster(data: ApplianceInput):
 
     X_raw = np.array([[
         daily_kwh,
-        data.has_ac,
-        data.ac_hours,
-        data.has_heater,
-        data.heater_hours,
-        data.num_fans,
-        data.occupants,
+        float(data.has_ac),
+        float(data.ac_hours),
+        float(data.ac_rooms),
+        float(data.has_heater),
+        float(data.heater_hours),
+        float(data.num_fans),
+        float(data.fan_hours),
+        float(data.has_washer),
+        float(data.washer_loads),
+        float(data.occupants),
+        float(data.has_solar),
     ]])
 
     X_scaled   = ml.kmeans_scaler.transform(X_raw)

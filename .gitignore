@@ -24,6 +24,7 @@ env/
 .env.staging
 backend/.env
 frontend/.env
+backend/serviceAccountKey.json
 
 # ── Model files — too large for Git, keep in Google Drive ─────────
 *.pkl
