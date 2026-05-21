@@ -1,30 +1,31 @@
-# ml/scripts/data_loader.py
-"""
-Loads and cleans the Sri Lankan appliance survey CSV and
-(optionally) the UCI Household Electric Power Consumption dataset.
-"""
-
 import os
 import pandas as pd
 import numpy as np
 
 SL_EMISSION_FACTOR = 0.52   # kg CO2 per kWh — SLSEA 2024
-DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
+
+
+if '__file__' in globals():
+    DATA_DIR = os.path.join(os.path.dirname(__file__), '..', 'data')
+else:
+    DATA_DIR = 'data'
 
 
 def load_survey_data(filepath=None):
-    """
-    Load and clean the Sri Lankan appliance survey CSV.
-    Works with both the synthetic dataset and real Google Form exports.
-    """
+   
     if filepath is None:
-        filepath = os.path.join(
-            DATA_DIR, 'SL_Appliance_Survey_Synthetic_200.csv'
-        )
+        
+        local_path = os.path.join(DATA_DIR, 'SL_Appliance_Survey_1.csv')
+        if not os.path.exists(local_path):
+            local_path = os.path.join(DATA_DIR, 'SL_Appliance_Survey_Synthetic_200.csv')
+            
+        if os.path.exists(local_path):
+            filepath = local_path
+        else:
+            filepath = "https://drive.google.com/uc?export=download&id=15usm0BgFCfkOGYyPlk76OnECWvrSwbY5"
 
     df = pd.read_csv(filepath)
 
-    # ── Rename columns ────────────────────────────────────────────────────
     rename_map = {
         'Timestamp':                        'timestamp',
         'Respondent_ID':                    'respondent_id',
@@ -73,7 +74,6 @@ def load_survey_data(filepath=None):
     # Only rename columns that actually exist
     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
 
-    # ── Convert Yes/No to 1/0 ─────────────────────────────────────────────
     yes_no_cols = [
         'has_ac', 'has_fridge', 'has_heater', 'has_washer',
         'has_computer', 'has_rice_cooker', 'has_microwave',
@@ -85,54 +85,8 @@ def load_survey_data(filepath=None):
                 df[col].astype(str).str.strip().str.lower() == 'yes'
             ).astype(int)
 
-    # ── Fill missing numeric values only ─────────────────────────────────
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     df[numeric_cols] = df[numeric_cols].fillna(0)
 
     print(f"Survey loaded: {len(df)} rows, {len(df.columns)} columns")
     return df
-
-
-def load_uci_data(filepath=None):
-    """
-    Load the UCI Household Electric Power Consumption dataset.
-    Download from: archive.ics.uci.edu/dataset/235
-    Aggregates minute-level readings to daily totals.
-    Returns None if the file is not found (dataset is optional).
-    """
-    if filepath is None:
-        filepath = os.path.join(DATA_DIR, 'household_power_consumption.txt')
-
-    if not os.path.exists(filepath):
-        print("UCI dataset not found — using survey data only.")
-        print(f"Expected at: {filepath}")
-        return None
-
-    print("Loading UCI dataset (~30 seconds)…")
-    df = pd.read_csv(
-        filepath,
-        sep=';',
-        parse_dates={'datetime': ['Date', 'Time']},
-        dayfirst=True,
-        low_memory=False,
-        na_values=['?'],
-    )
-    df.dropna(inplace=True)
-    df['Global_active_power'] = pd.to_numeric(df['Global_active_power'])
-    df['hour']      = df['datetime'].dt.hour
-    df['date']      = df['datetime'].dt.date
-    df['month']     = df['datetime'].dt.month
-    df['dayofweek'] = df['datetime'].dt.dayofweek
-
-    daily = df.groupby('date').agg(
-        daily_kwh     = ('Global_active_power', lambda x: x.sum() / 60),
-        peak_ratio    = ('Global_active_power',
-                         lambda x: x[df.loc[x.index, 'hour'].between(18, 22)].sum()
-                         / (x.sum() + 1e-9)),
-        month         = ('month',     'first'),
-        dayofweek     = ('dayofweek', 'first'),
-    ).reset_index()
-
-    daily['daily_co2_kg'] = (daily['daily_kwh'] * SL_EMISSION_FACTOR).round(3)
-    print(f"UCI loaded: {len(daily)} daily records")
-    return daily

@@ -20,12 +20,18 @@ import xgboost as xgb
 from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 
+# Resolve paths safely for local execution and Google Colab
+if '__file__' in globals():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+else:
+    base_dir = os.getcwd()
+
 # Allow running from any working directory
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, base_dir)
 from data_loader         import load_survey_data
 from feature_engineering import engineer_features, FEATURE_COLUMNS
 
-MODELS_DIR = os.path.join(os.path.dirname(__file__), '..', 'models')
+MODELS_DIR = os.path.join(base_dir, '..', 'models') if '__file__' in globals() else os.path.join(base_dir, 'models')
 os.makedirs(MODELS_DIR, exist_ok=True)
 
 
@@ -60,7 +66,7 @@ def train(df):
         n_jobs=-1,
     )
 
-    print("\nRunning GridSearchCV (this takes 1–3 minutes)…")
+    print("\nRunning GridSearchCV (this takes 1-3 minutes)...")
     grid_search = GridSearchCV(
         estimator=base_model,
         param_grid=param_grid,
@@ -82,20 +88,20 @@ def train(df):
     mape = np.mean(np.abs((y_test - y_pred) / (y_test + 1e-9))) * 100
 
     print("\n--- Test Set Metrics ---")
-    print(f"R²   : {r2:.4f}   (target ≥ 0.85)")
-    print(f"MAE  : {mae:.4f}  kg CO₂/day  (target ≤ 0.10)")
-    print(f"RMSE : {rmse:.4f} kg CO₂/day")
+    print(f"R2   : {r2:.4f}   (target >= 0.85)")
+    print(f"MAE  : {mae:.4f}  kg CO2/day  (target <= 0.10)")
+    print(f"RMSE : {rmse:.4f} kg CO2/day")
     print(f"MAPE : {mape:.2f}%")
 
     if r2 >= 0.85:
-        print("\n✅ R² target MET")
+        print("\n[OK] R2 target MET")
     else:
-        print("\n❌ R² below target — collect more survey responses and retrain")
+        print("\n[FAIL] R2 below target - collect more survey responses and retrain")
 
     # 5-fold CV on full dataset
     cv_scores = cross_val_score(best_model, X, y, cv=5, scoring='r2')
-    print(f"\n5-Fold CV R²: {[round(s,4) for s in cv_scores]}")
-    print(f"Mean CV R²  : {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
+    print(f"\n5-Fold CV R2: {[round(s,4) for s in cv_scores]}")
+    print(f"Mean CV R2  : {cv_scores.mean():.4f} +/- {cv_scores.std():.4f}")
 
     # Feature importance chart
     importances = pd.Series(
@@ -118,9 +124,9 @@ def train(df):
     lim = [min(y_test.min(), y_pred.min()) * 0.95,
            max(y_test.max(), y_pred.max()) * 1.05]
     plt.plot(lim, lim, 'r--', lw=1.5)
-    plt.xlabel('Actual CO₂ (kg/day)')
-    plt.ylabel('Predicted CO₂ (kg/day)')
-    plt.title(f'Actual vs Predicted  —  R² = {r2:.4f}')
+    plt.xlabel('Actual CO2 (kg/day)')
+    plt.ylabel('Predicted CO2 (kg/day)')
+    plt.title(f'Actual vs Predicted - R2 = {r2:.4f}')
     plt.tight_layout()
     scatter_path = os.path.join(MODELS_DIR, 'actual_vs_predicted.png')
     plt.savefig(scatter_path, dpi=150)
@@ -150,7 +156,7 @@ def save_models(model, city_encoder):
     # Quick load verification
     with open(os.path.join(MODELS_DIR, 'xgboost_model.pkl'), 'rb') as f:
         loaded = pickle.load(f)
-    print(f"\n✅ Verification: model loaded OK — type = {type(loaded).__name__}")
+    print(f"\n[OK] Verification: model loaded OK - type = {type(loaded).__name__}")
 
 
 if __name__ == '__main__':

@@ -20,10 +20,17 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import silhouette_score
 
-sys.path.insert(0, os.path.dirname(__file__))
+# Resolve paths safely for local execution and Google Colab
+if '__file__' in globals():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+else:
+    base_dir = os.getcwd()
+
+# Allow running from any working directory
+sys.path.insert(0, base_dir)
 from data_loader import load_survey_data
 
-MODELS_DIR = os.path.join(os.path.dirname(__file__), '..', 'models')
+MODELS_DIR = os.path.join(base_dir, '..', 'models') if '__file__' in globals() else os.path.join(base_dir, 'models')
 os.makedirs(MODELS_DIR, exist_ok=True)
 
 # ── Features used for clustering ──────────────────────────────────────────
@@ -160,8 +167,8 @@ def train(df, best_k=None):
                 label=label, alpha=0.7, s=50,
                 color=colors[cid % len(colors)],
             )
-        plt.xlabel('Daily kWh'); plt.ylabel('Daily CO₂ (kg)')
-        plt.title('K-Means Clusters — CarbonWise SL')
+        plt.xlabel('Daily kWh'); plt.ylabel('Daily CO2 (kg)')
+        plt.title('K-Means Clusters - CarbonWise SL')
         plt.legend(); plt.grid(alpha=0.3); plt.tight_layout()
         cluster_path = os.path.join(MODELS_DIR, 'kmeans_clusters.png')
         plt.savefig(cluster_path, dpi=150); plt.close()
@@ -188,7 +195,7 @@ def save_models(kmeans, scaler):
             pickle.dump(obj, f)
         print(f"Saved: {path}")
 
-    print("\n✅ K-Means models saved.")
+    print("\n[OK] K-Means models saved.")
 
 
 if __name__ == '__main__':

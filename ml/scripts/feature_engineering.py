@@ -125,7 +125,7 @@ def engineer_features(df, fit_encoder=True, city_encoder=None):
     y = df[TARGET_COLUMN] if TARGET_COLUMN in df.columns else None
 
     print(f"Feature matrix: {X.shape}  |  "
-          f"Target range: {y.min():.3f}–{y.max():.3f} kg CO₂/day"
+          f"Target range: {y.min():.3f} - {y.max():.3f} kg CO2/day"
           if y is not None else f"Feature matrix: {X.shape}")
 
     return X, y, city_encoder

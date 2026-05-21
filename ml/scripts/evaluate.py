@@ -1,23 +1,26 @@
-# ml/scripts/evaluate.py
-"""
-Loads all saved .pkl model files and runs a full end-to-end
-evaluation to verify the complete pipeline works exactly as it
-will in the FastAPI backend.
-
-Run from ml/scripts/:
-    python evaluate.py
-"""
-
 import os
 import sys
 import pickle
 import numpy as np
 
-sys.path.insert(0, os.path.dirname(__file__))
+try:
+    import shap
+except ImportError:
+    import subprocess
+    print("SHAP package not found. Installing SHAP...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "shap"])
+    import shap
+
+if '__file__' in globals():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+else:
+    base_dir = os.getcwd()
+
+sys.path.insert(0, base_dir)
 from data_loader         import load_survey_data
 from feature_engineering import engineer_features, FEATURE_COLUMNS
 
-MODELS_DIR = os.path.join(os.path.dirname(__file__), '..', 'models')
+MODELS_DIR = os.path.join(base_dir, '..', 'models') if '__file__' in globals() else os.path.join(base_dir, 'models')
 
 REQUIRED_FILES = [
     'xgboost_model.pkl',
@@ -32,7 +35,7 @@ REQUIRED_FILES = [
 
 def load_all():
     print("\n" + "=" * 60)
-    print("Loading all model files…")
+    print("Loading all model files...")
     print("=" * 60)
     models  = {}
     missing = []
@@ -42,9 +45,9 @@ def load_all():
             with open(path, 'rb') as f:
                 models[fname] = pickle.load(f)
             size = os.path.getsize(path) / 1024
-            print(f"  ✅  {fname:<32} ({size:.1f} KB)")
+            print(f"  [OK]  {fname:<32} ({size:.1f} KB)")
         else:
-            print(f"  ❌  {fname:<32} MISSING")
+            print(f"  [MISSING]  {fname:<32} MISSING")
             missing.append(fname)
 
     if missing:
@@ -55,7 +58,7 @@ def load_all():
         print("  3. python train_shap.py")
         sys.exit(1)
 
-    print(f"\nAll {len(REQUIRED_FILES)} model files loaded ✅")
+    print(f"\nAll {len(REQUIRED_FILES)} model files loaded [OK]")
     return models
 
 
@@ -76,8 +79,6 @@ def test_full_pipeline(models):
     city_encoder = models['city_encoder.pkl']
     config       = models['cluster_config.pkl']
 
-    # ── Simulated user input ──────────────────────────────────────────────
-    # Matches ApplianceInput schema in backend/schemas.py
     city       = 'Colombo'
     city_enc   = int(city_encoder.transform([city])[0])
 
@@ -89,14 +90,14 @@ def test_full_pipeline(models):
         'ac_hours':        7.0,
         'ac_temp':         24,
         'has_fridge':      1,
-        'fridge_kwh_day':  2.88,    # Medium fridge
+        'fridge_kwh_day':  2.88,   
         'has_heater':      0,
         'heater_kw':       0.0,
         'heater_hours':    0.0,
         'num_fans':        3,
         'fan_hours':       10.0,
         'num_tvs':         2,
-        'tv_kw':           0.07,    # LED/LCD
+        'tv_kw':           0.07,   
         'tv_hours':        5.0,
         'has_washer':      1,
         'washer_loads':    7.0,
@@ -105,7 +106,7 @@ def test_full_pipeline(models):
         'tube_light_count':2,
         'light_hours':     6.0,
         'has_computer':    1,
-        'pc_kw':           0.045,   # Laptop
+        'pc_kw':           0.045, 
         'computer_hours':  6.0,
         'has_rice_cooker': 1,
         'rice_cooker_uses':2,
@@ -133,26 +134,30 @@ def test_full_pipeline(models):
     monthly_kwh = monthly_co2 / SL_EF
 
     level = 'Low' if daily_co2 < 2.5 else ('Medium' if daily_co2 < 5.5 else 'High')
-    print(f"  Daily CO₂   : {daily_co2:.3f} kg")
-    print(f"  Monthly CO₂ : {monthly_co2:.2f} kg")
-    print(f"  Annual CO₂  : {annual_co2:.1f} kg")
+    print(f"  Daily CO2   : {daily_co2:.3f} kg")
+    print(f"  Monthly CO2 : {monthly_co2:.2f} kg")
+    print(f"  Annual CO2  : {annual_co2:.1f} kg")
     print(f"  Monthly kWh : {monthly_kwh:.1f} kWh")
     print(f"  Level       : {level}")
 
     # ── 2. SHAP explanation ───────────────────────────────────────────────
     print("\n--- Module 2: SHAP Explanation ---")
     shap_vals  = explainer.shap_values(X)[0]
-    base_value = float(explainer.expected_value)
+    base_value = explainer.expected_value
+    if isinstance(base_value, (np.ndarray, list)):
+        base_value = float(base_value[0])
+    else:
+        base_value = float(base_value)
     total_abs  = np.abs(shap_vals).sum() + 1e-9
 
     ranked = sorted(
         zip(features, shap_vals),
         key=lambda x: abs(x[1]), reverse=True
     )
-    print(f"  Base value (expected): {base_value:.4f} kg CO₂/day")
+    print(f"  Base value (expected): {base_value:.4f} kg CO2/day")
     print(f"  Top 5 SHAP contributions:")
     for feat, val in ranked[:5]:
-        direction = '↑ increases' if val > 0 else '↓ decreases'
+        direction = '+ increases' if val > 0 else '- decreases'
         pct = abs(val) / total_abs * 100
         print(f"    {feat:<25} {direction} by {abs(val):.4f} kg/day  ({pct:.1f}%)")
 
@@ -180,13 +185,13 @@ def test_full_pipeline(models):
     print(f"  Profile name : {cluster_name}")
     print(f"  Recommendations ({len(recs)}):")
     for i, rec in enumerate(recs, 1):
-        print(f"    {i}. {rec[:80]}…" if len(rec) > 80 else f"    {i}. {rec}")
+        print(f"    {i}. {rec[:80]}..." if len(rec) > 80 else f"    {i}. {rec}")
 
     # ── Summary ───────────────────────────────────────────────────────────
     print("\n" + "=" * 60)
-    print("ALL PIPELINE TESTS PASSED ✅")
+    print("ALL PIPELINE TESTS PASSED [OK]")
     print("=" * 60)
-    print("\nNext step — copy .pkl files to backend/models/:")
+    print("\nNext step - copy .pkl files to backend/models/:")
     print(f"  Source : {MODELS_DIR}/")
     print("  Dest   : carbonwise-sl/backend/models/")
     print("\nCommand (run from ml/):")
@@ -203,9 +208,9 @@ def test_model_consistency(models):
     print("=" * 60)
     saved_features = models['features.pkl']
     if saved_features == FEATURE_COLUMNS:
-        print(f"✅ features.pkl matches FEATURE_COLUMNS ({len(saved_features)} features)")
+        print(f"[OK] features.pkl matches FEATURE_COLUMNS ({len(saved_features)} features)")
     else:
-        print("❌ MISMATCH between features.pkl and FEATURE_COLUMNS!")
+        print("[FAIL] MISMATCH between features.pkl and FEATURE_COLUMNS!")
         print("   Retrain all models after editing feature_engineering.py")
         extra_saved = set(saved_features) - set(FEATURE_COLUMNS)
         extra_code  = set(FEATURE_COLUMNS) - set(saved_features)
