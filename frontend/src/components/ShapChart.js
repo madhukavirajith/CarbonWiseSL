@@ -1,5 +1,5 @@
-// frontend/src/components/ShapChart.js
 import React, { useState } from 'react';
+import { Search, ChevronUp, ChevronDown } from 'lucide-react';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid,
     Tooltip, ResponsiveContainer, Cell, ReferenceLine,
@@ -63,7 +63,7 @@ export default function ShapChart({ explanation }) {
                 background: '#FDECEA', border: '1px solid #C0392B30',
                 marginBottom: 20,
             }}>
-                <span style={{ fontSize: 24, flexShrink: 0 }}>🔍</span>
+                <Search size={24} color="#C0392B" style={{ flexShrink: 0, marginTop: 2 }} />
                 <div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: '#C0392B', marginBottom: 4 }}>
                         Biggest Culprit: {top_culprit}
@@ -192,12 +192,21 @@ export default function ShapChart({ explanation }) {
 
             {significant.length > 8 && (
                 <button onClick={() => setShowAll(v => !v)} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                     background: 'none', border: '1.5px solid #D0D7E0',
                     borderRadius: 8, padding: '8px 18px',
                     fontSize: 13, fontWeight: 600, color: '#0D7680', cursor: 'pointer',
                     width: '100%',
                 }}>
-                    {showAll ? '▲ Show less' : `▼ Show all ${significant.length} features`}
+                    {showAll ? (
+                        <>
+                            <ChevronUp size={14} /> Show less
+                        </>
+                    ) : (
+                        <>
+                            <ChevronDown size={14} /> Show all {significant.length} features
+                        </>
+                    )}
                 </button>
             )}
         </div>

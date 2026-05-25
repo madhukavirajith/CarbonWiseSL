@@ -1,7 +1,8 @@
-// frontend/src/components/Navbar.js
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
+import { User, ArrowRight } from 'lucide-react';
+import { useSpring, animated } from '@react-spring/web';
 
 const S = {
     nav: (scrolled) => ({
@@ -22,12 +23,6 @@ const S = {
         fontFamily: "'Poppins', sans-serif", fontWeight: 700,
         fontSize: 20, color: '#FFFFFF', textDecoration: 'none',
     },
-    logoIcon: {
-        width: 34, height: 34,
-        background: 'linear-gradient(135deg, #0D7680, #1B2A4A)',
-        borderRadius: 8, display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: 18,
-    },
     links: {
         display: 'flex', alignItems: 'center', gap: 8,
     },
@@ -40,6 +35,7 @@ const S = {
         border: active ? '1px solid rgba(13,118,128,0.4)' : '1px solid transparent',
     }),
     cta: {
+        display: 'inline-flex', alignItems: 'center', gap: 6,
         padding: '8px 20px', borderRadius: 8, fontSize: 14, fontWeight: 600,
         background: 'linear-gradient(135deg, #0D7680, #0a5d65)',
         color: '#fff', border: 'none', cursor: 'pointer',
@@ -47,6 +43,7 @@ const S = {
         textDecoration: 'none',
     },
     usernameText: {
+        display: 'inline-flex', alignItems: 'center', gap: 6,
         fontSize: 14,
         fontWeight: 600,
         color: '#B2DDE0',
@@ -79,24 +76,43 @@ export default function Navbar() {
     const isLanding = location.pathname === '/';
     const path = location.pathname;
 
+    const [logoHovered, setLogoHovered] = useState(false);
+    const logoSpring = useSpring({
+        transform: logoHovered ? 'scale(1.15) rotate(15deg)' : 'scale(1) rotate(0deg)',
+        config: { mass: 1, tension: 350, friction: 12 }
+    });
+
     return (
         <nav style={S.nav(scrolled || !isLanding)}>
-            <div style={S.inner}>
-                <Link to="/" style={S.logo}>
-                    <div style={S.logoIcon}>🌿</div>
-                    CarbonWise SL
+            <div style={{
+                maxWidth: 1200, margin: '0 auto',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                height: 64,
+            }}>
+                <Link 
+                    to="/" 
+                    style={S.logo}
+                    onMouseEnter={() => setLogoHovered(true)}
+                    onMouseLeave={() => setLogoHovered(false)}
+                >
+                    <animated.div style={{ ...logoSpring, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <img src="/logo.png" alt="CarbonWiseSL Logo" className="logo-glow" style={{ width: 34, height: 34, objectFit: 'contain' }} />
+                    </animated.div>
+                    CarbonWiseSL
                 </Link>
 
                 <div style={S.links}>
                     <Link to="/calculate" style={S.link(path === '/calculate')}>Calculate</Link>
                     <Link to="/solar" style={S.link(path === '/solar')}>Solar ROI</Link>
                     <Link to="/history" style={S.link(path === '/history')}>History</Link>
-                    
+
                     {user ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 8 }}>
-                            <span style={S.usernameText}>👤 {user.username}</span>
-                            <button 
-                                onClick={() => { logout(); navigate('/'); }} 
+                            <span style={S.usernameText}>
+                                <User size={14} /> {user.username}
+                            </span>
+                            <button
+                                onClick={() => { logout(); navigate('/'); }}
                                 style={S.logoutBtn}
                                 onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(192, 57, 43, 0.2)'; e.currentTarget.style.borderColor = 'rgba(192, 57, 43, 0.4)'; e.currentTarget.style.color = '#FF8A80'; }}
                                 onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'; e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)'; e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)'; }}
@@ -107,7 +123,9 @@ export default function Navbar() {
                     ) : (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 8 }}>
                             <Link to="/auth" style={S.link(path === '/auth')}>Sign In</Link>
-                            <Link to="/calculate" style={S.cta}>Get Started →</Link>
+                            <Link to="/calculate" style={S.cta}>
+                                Get Started <ArrowRight size={14} />
+                            </Link>
                         </div>
                     )}
                 </div>

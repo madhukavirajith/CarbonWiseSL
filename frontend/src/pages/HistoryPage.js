@@ -5,6 +5,7 @@ import { AppContext } from '../App';
 import { getHistory } from '../api';
 import TrendChart from '../components/TrendChart';
 import EmptyState from '../components/EmptyState';
+import { TrendingUp, CheckCircle2, AlertTriangle, Zap } from 'lucide-react';
 
 const levelColors = {
     Low: { bg: '#E8F5EE', color: '#1A7A4A', dot: '#1A7A4A' },
@@ -109,8 +110,10 @@ export default function HistoryPage() {
                         fontFamily: "'Poppins',sans-serif",
                         fontSize: 'clamp(26px,3vw,36px)',
                         fontWeight: 800, color: '#fff', marginBottom: 10,
+                        display: 'flex', alignItems: 'center', gap: 10
                     }}>
-                        📈 Emission History
+                        <TrendingUp size={32} style={{ color: '#B2DDE0' }} />
+                        Emission History
                     </h1>
                     <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.60)', maxWidth: 500, lineHeight: 1.7 }}>
                         Every prediction you submit is saved here so you can track your
@@ -164,9 +167,14 @@ export default function HistoryPage() {
                                         fontSize: 22, fontWeight: 800,
                                         color: parseFloat(trend) <= 0 ? '#80CBC4' : '#FF8A80',
                                         fontFamily: "'Poppins',sans-serif",
+                                        display: 'flex', alignItems: 'center', gap: 6,
                                     }}>
                                         {parseFloat(trend) > 0 ? '+' : ''}{trend} kg
-                                        {parseFloat(trend) <= 0 ? ' ✅' : ' ⚠️'}
+                                        {parseFloat(trend) <= 0 ? (
+                                            <CheckCircle2 size={18} style={{ color: '#80CBC4' }} />
+                                        ) : (
+                                            <AlertTriangle size={18} style={{ color: '#FF8A80' }} />
+                                        )}
                                     </div>
                                 </div>
                             )}
@@ -197,15 +205,17 @@ export default function HistoryPage() {
                         padding: '16px 20px', borderRadius: 12,
                         background: '#FDECEA', border: '1px solid #C0392B30',
                         color: '#C0392B', fontSize: 14, marginBottom: 20,
+                        display: 'flex', alignItems: 'center', gap: 8,
                     }}>
-                        ⚠️ {error}
+                        <AlertTriangle size={16} />
+                        {error}
                     </div>
                 )}
 
                 {!loading && !error && records.length === 0 && (
                     <div style={{ marginTop: 0 }}>
                         <EmptyState
-                            icon="📈"
+                            icon={<TrendingUp size={52} color="#0D7680" />}
                             title="No History Yet"
                             desc="Submit your first calculation to start tracking your carbon footprint over time."
                             actionLabel="Calculate My Footprint"
@@ -280,12 +290,13 @@ export default function HistoryPage() {
                                 </div>
                             </div>
                             <Link to="/calculate" style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 6,
                                 padding: '11px 24px', borderRadius: 10, fontSize: 14, fontWeight: 700,
                                 background: 'linear-gradient(135deg,#0D7680,#0a5d65)',
                                 color: '#fff', textDecoration: 'none',
                                 boxShadow: '0 3px 12px rgba(13,118,128,0.30)',
                             }}>
-                                ⚡ Recalculate Now
+                                <Zap size={14} /> Recalculate Now
                             </Link>
                         </div>
                     </div>

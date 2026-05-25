@@ -1,9 +1,9 @@
-// frontend/src/components/EmptyState.js
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { BarChart3, Zap } from 'lucide-react';
 
 export default function EmptyState({
-    icon = '📊',
+    icon = <BarChart3 size={52} color="#0D7680" />,
     title = 'Nothing here yet',
     desc = 'Start by calculating your footprint.',
     actionLabel = 'Calculate Now',
@@ -17,7 +17,7 @@ export default function EmptyState({
             background: '#fff', borderRadius: 20,
             border: '2px dashed #D0D7E0',
         }}>
-            <div style={{ fontSize: 56, marginBottom: 20 }}>{icon}</div>
+            <div style={{ marginBottom: 20 }}>{icon}</div>
             <h3 style={{
                 fontSize: 20, fontWeight: 700, color: '#1B2A4A',
                 fontFamily: "'Poppins',sans-serif", marginBottom: 10,
@@ -33,7 +33,7 @@ export default function EmptyState({
                 textDecoration: 'none',
                 boxShadow: '0 4px 16px rgba(13,118,128,0.30)',
             }}>
-                ⚡ {actionLabel}
+                <Zap size={14} /> {actionLabel}
             </Link>
         </div>
     );

@@ -1,6 +1,11 @@
 // frontend/src/components/ApplianceForm.js
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+    Home, Refrigerator, Snowflake, Fan, ShowerHead, Tv, WashingMachine, 
+    Laptop, CookingPot, Microwave, Shirt, ChefHat, Lightbulb, Sun, 
+    BarChart3, AlertTriangle, Zap, ArrowLeft, ArrowRight 
+} from 'lucide-react';
 import { predictEmissions, explainPrediction, getCluster } from '../api';
 import { AppContext } from '../App';
 import Loader from './Loader';
@@ -66,7 +71,9 @@ const Toggle = ({ label, name, checked, onChange, icon }) => (
         cursor: 'pointer', transition: 'all 0.2s', marginBottom: 8,
     }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 20 }}>{icon}</span>
+            <div style={{ display: 'flex', alignItems: 'center', color: checked ? '#0D7680' : '#8A9BB0' }}>
+                {icon}
+            </div>
             <span style={{ fontSize: 14, fontWeight: 600, color: '#1B2A4A' }}>{label}</span>
         </div>
         <div style={{
@@ -96,7 +103,9 @@ const SectionCard = ({ title, icon, children }) => (
             marginBottom: 20, paddingBottom: 14,
             borderBottom: '1px solid #F4F6F8',
         }}>
-            <span style={{ fontSize: 22 }}>{icon}</span>
+            <div style={{ display: 'flex', alignItems: 'center', color: '#0D7680' }}>
+                {icon}
+            </div>
             <h3 style={{
                 fontSize: 16, fontWeight: 700, color: '#1B2A4A', margin: 0,
                 fontFamily: "'Poppins',sans-serif"
@@ -217,7 +226,7 @@ export default function ApplianceForm() {
             {/* ── STEP 0: Household basics ── */}
             {step === 0 && (
                 <div className="animate-fadeUp">
-                    <SectionCard title="Household Details" icon="🏠">
+                    <SectionCard title="Household Details" icon={<Home size={20} />}>
                         <Grid2>
                             <div>
                                 <Label>City</Label>
@@ -241,8 +250,8 @@ export default function ApplianceForm() {
                         </div>
                     </SectionCard>
 
-                    <SectionCard title="Refrigerator" icon="🧊">
-                        <Toggle label="Has Refrigerator" name="has_fridge" icon="🧊"
+                    <SectionCard title="Refrigerator" icon={<Refrigerator size={20} />}>
+                        <Toggle label="Has Refrigerator" name="has_fridge" icon={<Refrigerator size={18} />}
                             checked={form.has_fridge === 1} onChange={change} />
                         {form.has_fridge === 1 && (
                             <div style={{ marginTop: 12 }}>
@@ -261,8 +270,8 @@ export default function ApplianceForm() {
             {/* ── STEP 1: Cooling & Heating ── */}
             {step === 1 && (
                 <div className="animate-fadeUp">
-                    <SectionCard title="Air Conditioner" icon="❄️">
-                        <Toggle label="Has Air Conditioner" name="has_ac" icon="❄️"
+                    <SectionCard title="Air Conditioner" icon={<Snowflake size={20} />}>
+                        <Toggle label="Has Air Conditioner" name="has_ac" icon={<Snowflake size={18} />}
                             checked={form.has_ac === 1} onChange={change} />
                         {form.has_ac === 1 && (
                             <div style={{ marginTop: 12 }}>
@@ -276,16 +285,18 @@ export default function ApplianceForm() {
                                     min={16} max={30} step={1} value={form.ac_temp} onChange={change}
                                     unit="°C" />
                                 <div style={{
+                                    display: 'flex', alignItems: 'center', gap: 8,
                                     padding: '10px 14px', borderRadius: 8, background: '#E6F4F5',
                                     fontSize: 13, color: '#0D7680', fontWeight: 500, marginTop: 4,
                                 }}>
-                                    💡 Setting AC to 26°C instead of 22°C saves up to 30% of AC energy.
+                                    <Lightbulb size={16} style={{ flexShrink: 0 }} />
+                                    <span>Setting AC to 26°C instead of 22°C saves up to 30% of AC energy.</span>
                                 </div>
                             </div>
                         )}
                     </SectionCard>
 
-                    <SectionCard title="Ceiling Fans" icon="💨">
+                    <SectionCard title="Ceiling Fans" icon={<Fan size={20} />}>
                         <Slider label="Number of Fans" name="num_fans"
                             min={0} max={10} step={1} value={form.num_fans} onChange={change}
                             unit=" fans" />
@@ -294,8 +305,8 @@ export default function ApplianceForm() {
                             unit=" hrs" />
                     </SectionCard>
 
-                    <SectionCard title="Water Heater" icon="🚿">
-                        <Toggle label="Has Water Heater" name="has_heater" icon="🚿"
+                    <SectionCard title="Water Heater" icon={<ShowerHead size={20} />}>
+                        <Toggle label="Has Water Heater" name="has_heater" icon={<ShowerHead size={18} />}
                             checked={form.has_heater === 1} onChange={change} />
                         {form.has_heater === 1 && (
                             <div style={{ marginTop: 12 }}>
@@ -319,7 +330,7 @@ export default function ApplianceForm() {
             {/* ── STEP 2: Appliances ── */}
             {step === 2 && (
                 <div className="animate-fadeUp">
-                    <SectionCard title="Television" icon="📺">
+                    <SectionCard title="Television" icon={<Tv size={20} />}>
                         <Grid2>
                             <div>
                                 <Slider label="Number of TVs" name="num_tvs"
@@ -340,8 +351,8 @@ export default function ApplianceForm() {
                             unit=" hrs" />
                     </SectionCard>
 
-                    <SectionCard title="Washing Machine" icon="🫧">
-                        <Toggle label="Has Washing Machine" name="has_washer" icon="🫧"
+                    <SectionCard title="Washing Machine" icon={<WashingMachine size={20} />}>
+                        <Toggle label="Has Washing Machine" name="has_washer" icon={<WashingMachine size={18} />}
                             checked={form.has_washer === 1} onChange={change} />
                         {form.has_washer === 1 && (
                             <Slider label="Loads Per Week" name="washer_loads"
@@ -350,8 +361,8 @@ export default function ApplianceForm() {
                         )}
                     </SectionCard>
 
-                    <SectionCard title="Computer / Laptop" icon="💻">
-                        <Toggle label="Has Computer or Laptop" name="has_computer" icon="💻"
+                    <SectionCard title="Computer / Laptop" icon={<Laptop size={20} />}>
+                        <Toggle label="Has Computer or Laptop" name="has_computer" icon={<Laptop size={18} />}
                             checked={form.has_computer === 1} onChange={change} />
                         {form.has_computer === 1 && (
                             <div style={{ marginTop: 12 }}>
@@ -370,22 +381,22 @@ export default function ApplianceForm() {
                         )}
                     </SectionCard>
 
-                    <SectionCard title="Kitchen Appliances" icon="🍳">
-                        <Toggle label="Has Rice Cooker" name="has_rice_cooker" icon="🍚"
+                    <SectionCard title="Kitchen Appliances" icon={<ChefHat size={20} />}>
+                        <Toggle label="Has Rice Cooker" name="has_rice_cooker" icon={<CookingPot size={18} />}
                             checked={form.has_rice_cooker === 1} onChange={change} />
                         {form.has_rice_cooker === 1 && (
                             <Slider label="Uses Per Day" name="rice_cooker_uses"
                                 min={0} max={4} step={1} value={form.rice_cooker_uses} onChange={change}
                                 unit="x" />
                         )}
-                        <Toggle label="Has Microwave" name="has_microwave" icon="📡"
+                        <Toggle label="Has Microwave" name="has_microwave" icon={<Microwave size={18} />}
                             checked={form.has_microwave === 1} onChange={change} />
                         {form.has_microwave === 1 && (
                             <Slider label="Daily Usage Hours" name="microwave_hours"
                                 min={0} max={3} step={0.25} value={form.microwave_hours} onChange={change}
                                 unit=" hrs" />
                         )}
-                        <Toggle label="Has Electric Iron" name="has_iron" icon="👔"
+                        <Toggle label="Has Electric Iron" name="has_iron" icon={<Shirt size={18} />}
                             checked={form.has_iron === 1} onChange={change} />
                         {form.has_iron === 1 && (
                             <Slider label="Usage Hours Per Week" name="iron_hours_week"
@@ -399,7 +410,7 @@ export default function ApplianceForm() {
             {/* ── STEP 3: Lighting & Solar ── */}
             {step === 3 && (
                 <div className="animate-fadeUp">
-                    <SectionCard title="Lighting" icon="💡">
+                    <SectionCard title="Lighting" icon={<Lightbulb size={20} />}>
                         <Slider label="Number of LED Bulbs" name="led_count"
                             min={0} max={30} step={1} value={form.led_count} onChange={change}
                             unit=" bulbs" />
@@ -414,17 +425,21 @@ export default function ApplianceForm() {
                             unit=" hrs" />
                         {form.old_bulb_count > 0 && (
                             <div style={{
+                                display: 'flex', alignItems: 'center', gap: 8,
                                 padding: '10px 14px', borderRadius: 8, background: '#FDF6E3',
                                 fontSize: 13, color: '#C8932A', fontWeight: 500, marginTop: 4,
                             }}>
-                                💡 Replacing {form.old_bulb_count} old bulb(s) with LED would save approximately{' '}
-                                {(form.old_bulb_count * form.light_hours * (0.055 - 0.009) * 0.52).toFixed(2)} kg CO₂/day.
+                                <Lightbulb size={16} style={{ flexShrink: 0 }} />
+                                <span>
+                                    Replacing {form.old_bulb_count} old bulb(s) with LED would save approximately{' '}
+                                    {(form.old_bulb_count * form.light_hours * (0.055 - 0.009) * 0.52).toFixed(2)} kg CO₂/day.
+                                </span>
                             </div>
                         )}
                     </SectionCard>
 
-                    <SectionCard title="Solar Panels" icon="☀️">
-                        <Toggle label="Has Rooftop Solar Panels" name="has_solar" icon="☀️"
+                    <SectionCard title="Solar Panels" icon={<Sun size={20} />}>
+                        <Toggle label="Has Rooftop Solar Panels" name="has_solar" icon={<Sun size={18} />}
                             checked={form.has_solar === 1} onChange={change} />
                         {form.has_solar === 1 && (
                             <Slider label="Solar System Capacity" name="solar_kw"
@@ -433,13 +448,17 @@ export default function ApplianceForm() {
                         )}
                         {form.has_solar === 0 && (
                             <div style={{
+                                display: 'flex', alignItems: 'center', gap: 8,
                                 padding: '10px 14px', borderRadius: 8,
                                 background: '#E6F4F5', fontSize: 13, color: '#0D7680', marginTop: 8,
                             }}>
-                                ☀️ Wondering if solar is worth it?{' '}
-                                <a href="/solar" style={{ color: '#0D7680', fontWeight: 700 }}>
-                                    Use our Solar ROI Calculator →
-                                </a>
+                                <Sun size={16} style={{ flexShrink: 0 }} />
+                                <span>
+                                    Wondering if solar is worth it?{' '}
+                                    <a href="/solar" style={{ color: '#0D7680', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                        Use our Solar ROI Calculator <ArrowRight size={14} />
+                                    </a>
+                                </span>
                             </div>
                         )}
                     </SectionCard>
@@ -450,8 +469,9 @@ export default function ApplianceForm() {
                         background: 'linear-gradient(135deg,#1B2A4A,#0D3B45)',
                         marginBottom: 20,
                     }}>
-                        <div style={{ fontSize: 13, color: '#B2DDE0', fontWeight: 600, marginBottom: 12 }}>
-                            📊 Quick Estimate Preview
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#B2DDE0', fontWeight: 600, marginBottom: 12 }}>
+                            <BarChart3 size={16} />
+                            <span>Quick Estimate Preview</span>
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                             <div>
@@ -487,11 +507,13 @@ export default function ApplianceForm() {
             {/* Error */}
             {error && (
                 <div style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
                     padding: '14px 18px', borderRadius: 10, marginBottom: 20,
                     background: '#FDECEA', border: '1px solid #C0392B',
                     color: '#C0392B', fontSize: 14,
                 }}>
-                    ⚠️ {error}
+                    <AlertTriangle size={16} style={{ flexShrink: 0 }} />
+                    <span>{error}</span>
                 </div>
             )}
 
@@ -505,7 +527,9 @@ export default function ApplianceForm() {
                         color: step === 0 ? '#B0B8C4' : '#1B2A4A',
                         border: '1.5px solid #D0D7E0', cursor: step === 0 ? 'not-allowed' : 'pointer',
                     }}>
-                    ← Back
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        <ArrowLeft size={16} /> Back
+                    </div>
                 </button>
 
                 {step < totalSteps - 1 ? (
@@ -515,7 +539,9 @@ export default function ApplianceForm() {
                         color: '#fff', border: 'none', cursor: 'pointer',
                         boxShadow: '0 4px 16px rgba(13,118,128,0.30)',
                     }}>
-                        Next →
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                            Next <ArrowRight size={16} />
+                        </div>
                     </button>
                 ) : (
                     <button onClick={submit} style={{
@@ -524,7 +550,9 @@ export default function ApplianceForm() {
                         color: '#fff', border: 'none', cursor: 'pointer',
                         boxShadow: '0 4px 20px rgba(13,118,128,0.40)',
                     }}>
-                        ⚡ Calculate My Carbon Footprint
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                            <Zap size={16} /> Calculate My Carbon Footprint
+                        </div>
                     </button>
                 )}
             </div>

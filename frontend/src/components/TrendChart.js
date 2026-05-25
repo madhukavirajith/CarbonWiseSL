@@ -1,5 +1,5 @@
-// frontend/src/components/TrendChart.js
 import React from 'react';
+import { BarChart2 } from 'lucide-react';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid,
     Tooltip, ResponsiveContainer, ReferenceLine, Area, AreaChart,
@@ -27,10 +27,12 @@ export default function TrendChart({ records }) {
     if (!records || records.length === 0) {
         return (
             <div style={{
-                textAlign: 'center', padding: '40px 20px',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                gap: 12, padding: '40px 20px',
                 color: '#8A9BB0', fontSize: 14,
             }}>
-                📊 No trend data yet. Submit more predictions to see your progress.
+                <BarChart2 size={36} color="#8A9BB0" />
+                <span>No trend data yet. Submit more predictions to see your progress.</span>
             </div>
         );
     }

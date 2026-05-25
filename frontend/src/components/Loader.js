@@ -1,5 +1,6 @@
 // frontend/src/components/Loader.js
 import React from 'react';
+import { Leaf } from 'lucide-react';
 
 export default function Loader({ message = 'Calculating your carbon footprint...' }) {
     return (
@@ -19,8 +20,10 @@ export default function Loader({ message = 'Calculating your carbon footprint...
                 <div style={{
                     position: 'absolute', inset: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 26,
-                }}>🌿</div>
+                    color: '#0D7680',
+                }}>
+                    <Leaf size={26} />
+                </div>
             </div>
             <div style={{ textAlign: 'center' }}>
                 <div style={{

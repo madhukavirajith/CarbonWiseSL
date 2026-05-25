@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { AppContext } from '../App';
 import { loginUser, signupUser } from '../api';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 const S = {
     container: {
@@ -210,13 +211,13 @@ export default function AuthPage() {
 
                 {error && (
                     <div style={S.errorAlert}>
-                        <span>⚠️</span> {error}
+                        <AlertTriangle size={16} style={{ flexShrink: 0 }} /> {error}
                     </div>
                 )}
 
                 {success && (
                     <div style={S.successAlert}>
-                        <span>✅</span> {success}
+                        <CheckCircle2 size={16} style={{ flexShrink: 0 }} /> {success}
                     </div>
                 )}
 

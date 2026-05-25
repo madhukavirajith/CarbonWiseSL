@@ -1,6 +1,16 @@
-// frontend/src/pages/SolarPage.js
 import React, { useState } from 'react';
 import { solarRoi } from '../api';
+import {
+    Sun,
+    Zap,
+    Coins,
+    Leaf,
+    Calendar,
+    AlertTriangle,
+    AlertCircle,
+    CheckCircle2,
+    Loader2
+} from 'lucide-react';
 
 const Input = ({ label, name, type = 'number', value, onChange, min, max, step, unit, hint }) => (
     <div style={{ marginBottom: 20 }}>
@@ -28,7 +38,7 @@ const Input = ({ label, name, type = 'number', value, onChange, min, max, step, 
     </div>
 );
 
-const ResultCard = ({ icon, label, value, sub, color, big }) => (
+const ResultCard = ({ icon: Icon, label, value, sub, color, big }) => (
     <div style={{
         background: '#fff', borderRadius: 14, padding: '22px 20px',
         border: `1.5px solid ${color}25`,
@@ -37,7 +47,9 @@ const ResultCard = ({ icon, label, value, sub, color, big }) => (
     }}
         onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
         onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
-        <div style={{ fontSize: 26, marginBottom: 10 }}>{icon}</div>
+        <div style={{ color: color, marginBottom: 10, display: 'flex' }}>
+            <Icon size={26} />
+        </div>
         <div style={{
             fontSize: 11, fontWeight: 700, color: color,
             textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 6,
@@ -105,7 +117,7 @@ export default function SolarPage() {
                         border: '1px solid rgba(200,147,42,0.40)',
                         borderRadius: 100, padding: '5px 14px', marginBottom: 18,
                     }}>
-                        <span style={{ fontSize: 14 }}>☀️</span>
+                        <Sun size={14} color="#FDF6E3" />
                         <span style={{ fontSize: 12, color: '#FDF6E3', fontWeight: 600 }}>
                             Uses SLSEA Solar Irradiance Data — Colombo, Kandy, Galle
                         </span>
@@ -189,9 +201,9 @@ export default function SolarPage() {
                                 padding: '14px 16px', borderRadius: 10,
                                 background: '#FDF6E3', border: '1px solid #C8932A30',
                                 marginBottom: 20, fontSize: 13,
-                            }}>
-                                <div style={{ fontWeight: 700, color: '#C8932A', marginBottom: 4 }}>
-                                    ☀️ Quick Estimate
+                             }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, color: '#C8932A', marginBottom: 4 }}>
+                                    <Sun size={14} /> Quick Estimate
                                 </div>
                                 <div style={{ color: '#5A6A7A', lineHeight: 1.7 }}>
                                     System size: ~<strong>{(form.roof_area_sqm * 0.18).toFixed(1)} kW</strong>
@@ -202,11 +214,12 @@ export default function SolarPage() {
 
                             {error && (
                                 <div style={{
+                                    display: 'flex', alignItems: 'center', gap: 8,
                                     padding: '12px 16px', borderRadius: 9,
                                     background: '#FDECEA', color: '#C0392B',
                                     fontSize: 13, marginBottom: 16,
                                 }}>
-                                    ⚠️ {error}
+                                    <AlertTriangle size={16} /> {error}
                                 </div>
                             )}
 
@@ -219,8 +232,17 @@ export default function SolarPage() {
                                 color: loading ? '#B0B8C4' : '#fff',
                                 border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                                 boxShadow: loading ? 'none' : '0 4px 16px rgba(200,147,42,0.35)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                             }}>
-                                {loading ? '⏳ Calculating…' : '☀️ Calculate Solar ROI'}
+                                {loading ? (
+                                    <>
+                                        <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Calculating…
+                                    </>
+                                ) : (
+                                    <>
+                                        <Sun size={16} /> Calculate Solar ROI
+                                    </>
+                                )}
                             </button>
                         </form>
                     </div>
@@ -236,7 +258,9 @@ export default function SolarPage() {
                                 alignItems: 'center', justifyContent: 'center',
                                 minHeight: 400, textAlign: 'center',
                             }}>
-                                <span style={{ fontSize: 56, marginBottom: 20 }}>☀️</span>
+                                <span style={{ color: '#8A9BB0', marginBottom: 20, display: 'flex' }}>
+                                    <Sun size={56} />
+                                </span>
                                 <h3 style={{
                                     fontSize: 18, fontWeight: 700, color: '#1B2A4A',
                                     fontFamily: "'Poppins',sans-serif", marginBottom: 10,
@@ -265,25 +289,25 @@ export default function SolarPage() {
                                     gap: 12, marginBottom: 16,
                                 }}>
                                     <ResultCard
-                                        icon="⚡" label="Annual Generation"
+                                        icon={Zap} label="Annual Generation"
                                         value={result.annual_kwh_generated.toLocaleString()}
                                         sub="kWh per year"
                                         color="#C8932A" big
                                     />
                                     <ResultCard
-                                        icon="💰" label="Annual Bill Saving"
+                                        icon={Coins} label="Annual Bill Saving"
                                         value={`LKR ${Math.round(result.annual_cost_saving_lkr).toLocaleString()}`}
                                         sub={`LKR ${Math.round(result.monthly_cost_saving_lkr).toLocaleString()} / month`}
                                         color="#1A7A4A"
                                     />
                                     <ResultCard
-                                        icon="🌿" label="Lifetime CO₂ Saved"
+                                        icon={Leaf} label="Lifetime CO₂ Saved"
                                         value={`${Math.round(result.lifetime_co2_saving_kg).toLocaleString()} kg`}
                                         sub="Over 25 years"
                                         color="#0D7680"
                                     />
                                     <ResultCard
-                                        icon="📅" label="Payback Period"
+                                        icon={Calendar} label="Payback Period"
                                         value={`${result.payback_years} years`}
                                         sub="Return on investment"
                                         color={result.payback_years < 8 ? '#1A7A4A' : '#C8932A'}
@@ -298,15 +322,32 @@ export default function SolarPage() {
                                     border: `1.5px solid ${result.payback_years < 8 ? '#1A7A4A' : '#C8932A'}30`,
                                 }}>
                                     <div style={{
+                                        display: 'flex', alignItems: 'center', gap: 6,
                                         fontSize: 14, fontWeight: 700,
                                         color: result.payback_years < 8 ? '#1A7A4A' : '#C8932A',
                                         marginBottom: 6,
                                     }}>
-                                        {result.payback_years < 6
-                                            ? '🟢 Excellent Investment'
-                                            : result.payback_years < 10
-                                                ? '🟡 Good Investment'
-                                                : '🟠 Marginal — Consider Smaller System'}
+                                        {(() => {
+                                            if (result.payback_years < 6) {
+                                                return (
+                                                    <>
+                                                        <CheckCircle2 size={16} /> Excellent Investment
+                                                    </>
+                                                );
+                                            } else if (result.payback_years < 10) {
+                                                return (
+                                                    <>
+                                                        <AlertCircle size={16} /> Good Investment
+                                                    </>
+                                                );
+                                            } else {
+                                                return (
+                                                    <>
+                                                        <AlertTriangle size={16} /> Marginal — Consider Smaller System
+                                                    </>
+                                                );
+                                            }
+                                        })()}
                                     </div>
                                     <div style={{ fontSize: 13, color: '#5A6A7A', lineHeight: 1.7 }}>
                                         A {result.system_size_kw} kW system on your {form.roof_area_sqm} m² roof in{' '}

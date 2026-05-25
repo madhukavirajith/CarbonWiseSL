@@ -1,5 +1,5 @@
-// frontend/src/components/ClusterCard.js
 import React from 'react';
+import { Wind, Leaf, Users, Home, Lightbulb } from 'lucide-react';
 
 const clusterColors = {
     0: { primary: '#0D7680', bg: '#E6F4F5', border: '#B2DDE0' },
@@ -7,11 +7,19 @@ const clusterColors = {
     2: { primary: '#7B3F9E', bg: '#F3EBF8', border: '#D4A8E8' },
 };
 
+const iconMap = {
+    '❄️': Wind,
+    '🌿': Leaf,
+    '👨‍👩‍👧‍👦': Users,
+    '🏠': Home,
+};
+
 export default function ClusterCard({ cluster }) {
     if (!cluster) return null;
 
     const { cluster_id, cluster_name, cluster_icon, recommendations } = cluster;
     const colors = clusterColors[cluster_id] || clusterColors[0];
+    const IconComponent = iconMap[cluster_icon] || Home;
 
     return (
         <div style={{
@@ -28,13 +36,14 @@ export default function ClusterCard({ cluster }) {
                 display: 'flex', alignItems: 'center', gap: 14,
             }}>
                 <div style={{
-                    width: 52, height: 52, borderRadius: 14, fontSize: 26,
+                    width: 52, height: 52, borderRadius: 14,
                     background: colors.primary + '18',
                     border: `1.5px solid ${colors.primary}30`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: colors.primary,
                     flexShrink: 0,
                 }}>
-                    {cluster_icon}
+                    <IconComponent size={24} />
                 </div>
                 <div>
                     <div style={{
@@ -55,10 +64,11 @@ export default function ClusterCard({ cluster }) {
             {/* Recommendations */}
             <div style={{ padding: '20px 24px' }}>
                 <div style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
                     fontSize: 12, fontWeight: 700, color: '#8A9BB0',
                     textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 14,
                 }}>
-                    💡 Personalised Recommendations
+                    <Lightbulb size={14} color="#C8932A" /> Personalised Recommendations
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {recommendations.map((rec, i) => (

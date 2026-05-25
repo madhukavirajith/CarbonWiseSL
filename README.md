@@ -1,7 +1,7 @@
-# CarbonWise SL 🌿
+# CarbonWiseSL
 
 <p align="center">
-  <img src="assets/dashboard_mockup.png" alt="CarbonWise SL Dashboard Mockup" width="100%" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
+  <img src="assets/dashboard_mockup.png" alt="CarbonWiseSL Dashboard Mockup" width="100%" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
 </p>
 
 <p align="center">
@@ -41,7 +41,7 @@
 
 ## 🌟 Overview
 
-**CarbonWise SL** is the first AI-powered electricity carbon footprint tracker engineered specifically for urban Sri Lankan households. Combining machine learning with local energy grid data, it enables households to forecast carbon emissions, isolate energy-hogging appliances using advanced explainable AI (SHAP), profile user consumption behavior (K-Means), and simulate green energy transformations.
+**CarbonWiseSL** is the first AI-powered electricity carbon footprint tracker engineered specifically for urban Sri Lankan households. Combining machine learning with local energy grid data, it enables households to forecast carbon emissions, isolate energy-hogging appliances using advanced explainable AI (SHAP), profile user consumption behavior (K-Means), and simulate green energy transformations.
 
 ---
 
@@ -118,7 +118,7 @@ graph TD
 
 ## 🧠 AI & Machine Learning Models
 
-CarbonWise SL splits model training from model production serving to maintain a lightweight, scalable web application architecture.
+CarbonWiseSL splits model training from model production serving to maintain a lightweight, scalable web application architecture.
 
 | Model | Type | Task / Purpose | Performance Targets |
 | :--- | :--- | :--- | :--- |
@@ -202,7 +202,7 @@ carbonwise-sl/
 
 ## 📈 Data Sources & Standards
 
-To ensure localized accuracy, CarbonWise SL integrates regional Sri Lankan energy statistics and tariffs:
+To ensure localized accuracy, CarbonWiseSL integrates regional Sri Lankan energy statistics and tariffs:
 
 *   ⚡ **Grid Emission Factor (SLSEA 2024)**: Programmed at **0.52 kg CO₂/kWh**, reflecting Sri Lanka’s national grid energy mix (thermal, hydro, and non-conventional renewables).
 *   💵 **Domestic Tariff Structure (CEB 2024)**: Implements the official Ceylon Electricity Board (CEB) progressive 5-tier pricing model for domestic connections.

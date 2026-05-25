@@ -1,11 +1,26 @@
 // frontend/src/components/WhatIfSimulator.js
 import React, { useState } from 'react';
 import { simulate } from '../api';
+import { 
+    Snowflake, 
+    Clock, 
+    Lightbulb, 
+    WashingMachine, 
+    Plug, 
+    Zap, 
+    Play, 
+    Loader2, 
+    Flame, 
+    CheckCircle2, 
+    Droplets, 
+    FileText, 
+    AlertTriangle 
+} from 'lucide-react';
 
 const scenarios = [
     {
         id: 'ac_temp',
-        icon: '❄️',
+        icon: Snowflake,
         title: 'Lower AC Temperature Setting',
         desc: 'What if you set AC to a higher (more efficient) temperature?',
         inputLabel: 'New temperature (°C)',
@@ -14,7 +29,7 @@ const scenarios = [
     },
     {
         id: 'ac_hours',
-        icon: '⏱️',
+        icon: Clock,
         title: 'Reduce AC Runtime',
         desc: 'What if you run the AC fewer hours per day?',
         inputLabel: 'New daily runtime (hours)',
@@ -23,7 +38,7 @@ const scenarios = [
     },
     {
         id: 'led_upgrade',
-        icon: '💡',
+        icon: Lightbulb,
         title: 'Replace All Bulbs with LED',
         desc: 'What if you replaced every old and fluorescent bulb with 9W LEDs?',
         inputLabel: 'Total bulbs to replace',
@@ -32,7 +47,7 @@ const scenarios = [
     },
     {
         id: 'washer_shift',
-        icon: '🫧',
+        icon: WashingMachine,
         title: 'Reduce Washing Machine Loads',
         desc: 'What if you reduced your weekly washing loads?',
         inputLabel: 'New loads per week',
@@ -41,7 +56,7 @@ const scenarios = [
     },
     {
         id: 'standby',
-        icon: '🔌',
+        icon: Plug,
         title: 'Eliminate Standby Power',
         desc: 'What if you turned off devices fully instead of leaving on standby?',
         inputLabel: 'Devices to switch off',
@@ -52,19 +67,20 @@ const scenarios = [
 
 function ImpactBadge({ label }) {
     const config = {
-        'High Impact': { bg: '#E8F5EE', color: '#1A7A4A', icon: '🔥' },
-        'Medium Impact': { bg: '#FDF6E3', color: '#C8932A', icon: '✅' },
-        'Low Impact': { bg: '#F4F6F8', color: '#8A9BB0', icon: '💧' },
+        'High Impact': { bg: '#E8F5EE', color: '#1A7A4A', icon: Flame },
+        'Medium Impact': { bg: '#FDF6E3', color: '#C8932A', icon: CheckCircle2 },
+        'Low Impact': { bg: '#F4F6F8', color: '#8A9BB0', icon: Droplets },
     };
     const c = config[label] || config['Low Impact'];
+    const Icon = c.icon;
     return (
         <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4,
+            display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '3px 10px', borderRadius: 100,
             background: c.bg, color: c.color,
             fontSize: 11, fontWeight: 700,
         }}>
-            {c.icon} {label}
+            <Icon size={12} /> {label}
         </span>
     );
 }
@@ -113,12 +129,13 @@ export default function WhatIfSimulator({ formData }) {
                     how much CO₂ and money you would save with that change.
                 </div>
                 <button onClick={runAll} style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
                     padding: '10px 22px', borderRadius: 10, fontSize: 13, fontWeight: 700,
                     background: 'linear-gradient(135deg,#1B2A4A,#0D3B45)',
                     color: '#fff', border: 'none', cursor: 'pointer',
                     boxShadow: '0 3px 10px rgba(27,42,74,0.25)',
                 }}>
-                    ⚡ Simulate All
+                    <Zap size={14} /> Simulate All
                 </button>
             </div>
 
@@ -128,6 +145,7 @@ export default function WhatIfSimulator({ formData }) {
                     const result = results[sc.id];
                     const isLoading = loading[sc.id];
                     const hasResult = result && !result.error;
+                    const IconComponent = sc.icon;
 
                     return (
                         <div key={sc.id} style={{
@@ -144,7 +162,13 @@ export default function WhatIfSimulator({ formData }) {
                                     justifyContent: 'space-between', gap: 12, marginBottom: 14,
                                 }}>
                                     <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                                        <span style={{ fontSize: 24, flexShrink: 0 }}>{sc.icon}</span>
+                                        <span style={{ 
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            width: 40, height: 40, borderRadius: 10, 
+                                            background: '#E6F4F5', color: '#0D7680', flexShrink: 0 
+                                        }}>
+                                            <IconComponent size={20} />
+                                        </span>
                                         <div>
                                             <div style={{ fontSize: 15, fontWeight: 700, color: '#1B2A4A', marginBottom: 3 }}>
                                                 {sc.title}
@@ -187,6 +211,7 @@ export default function WhatIfSimulator({ formData }) {
                                 {/* Simulate button */}
                                 <button onClick={() => runScenario(sc)} disabled={isLoading}
                                     style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: 6,
                                         padding: '9px 20px', borderRadius: 8, fontSize: 13, fontWeight: 600,
                                         background: isLoading
                                             ? '#E8ECF0'
@@ -195,7 +220,17 @@ export default function WhatIfSimulator({ formData }) {
                                         border: 'none', cursor: isLoading ? 'not-allowed' : 'pointer',
                                         transition: 'all 0.2s',
                                     }}>
-                                    {isLoading ? '⏳ Running…' : '▶ Simulate'}
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />
+                                            Running…
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Play size={14} fill="currentColor" />
+                                            Simulate
+                                        </>
+                                    )}
                                 </button>
                             </div>
 
@@ -253,8 +288,9 @@ export default function WhatIfSimulator({ formData }) {
                                             </div>
                                         ))}
                                     </div>
-                                    <div style={{ fontSize: 12, color: '#5A6A7A', marginTop: 12 }}>
-                                        📋 {result.description}
+                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, fontSize: 12, color: '#5A6A7A', marginTop: 12 }}>
+                                        <FileText size={14} style={{ marginTop: 2, flexShrink: 0 }} />
+                                        <span>{result.description}</span>
                                     </div>
                                 </div>
                             )}
@@ -263,8 +299,10 @@ export default function WhatIfSimulator({ formData }) {
                                 <div style={{
                                     borderTop: '1px solid #FDECEA', padding: '12px 22px',
                                     background: '#FDECEA', fontSize: 13, color: '#C0392B',
+                                    display: 'flex', alignItems: 'center', gap: 6,
                                 }}>
-                                    ⚠️ {result.error}
+                                    <AlertTriangle size={14} />
+                                    <span>{result.error}</span>
                                 </div>
                             )}
                         </div>

@@ -1,4 +1,3 @@
-// frontend/src/pages/ResultsPage.js
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AppContext } from '../App';
@@ -8,9 +7,31 @@ import ClusterCard from '../components/ClusterCard';
 import WhatIfSimulator from '../components/WhatIfSimulator';
 import EmissionGauge from '../components/EmissionGauge';
 import { saveHistory } from '../api';
+import {
+    BarChart3,
+    Search,
+    Users,
+    Sliders,
+    CheckCircle2,
+    ArrowLeft,
+    Sun,
+    TrendingUp,
+    AlertCircle,
+    Leaf,
+    Lightbulb,
+    Wind,
+    Home
+} from 'lucide-react';
+
+const iconMap = {
+    '❄️': Wind,
+    '🌿': Leaf,
+    '👨‍👩‍👧‍👦': Users,
+    '🏠': Home,
+};
 
 /* ── Tab button ─────────────────────────────────────────────────── */
-const Tab = ({ id, label, icon, active, onClick }) => (
+const Tab = ({ id, label, icon: Icon, active, onClick }) => (
     <button onClick={() => onClick(id)} style={{
         display: 'flex', alignItems: 'center', gap: 7,
         padding: '10px 18px', borderRadius: 10,
@@ -23,7 +44,7 @@ const Tab = ({ id, label, icon, active, onClick }) => (
         transition: 'all 0.2s',
         boxShadow: active ? '0 3px 12px rgba(13,118,128,0.30)' : 'none',
     }}>
-        <span style={{ fontSize: 16 }}>{icon}</span>
+        <Icon size={16} />
         <span style={{ display: window.innerWidth < 500 ? 'none' : 'block' }}>{label}</span>
     </button>
 );
@@ -73,10 +94,10 @@ export default function ResultsPage() {
     const { prediction, explanation, cluster } = results;
 
     const tabs = [
-        { id: 'overview', label: 'Overview', icon: '📊' },
-        { id: 'breakdown', label: 'Appliance Breakdown', icon: '🔍' },
-        { id: 'profile', label: 'My Profile', icon: '👥' },
-        { id: 'simulator', label: 'What-If Simulator', icon: '🎛️' },
+        { id: 'overview', label: 'Overview', icon: BarChart3 },
+        { id: 'breakdown', label: 'Appliance Breakdown', icon: Search },
+        { id: 'profile', label: 'My Profile', icon: Users },
+        { id: 'simulator', label: 'What-If Simulator', icon: Sliders },
     ];
 
     return (
@@ -101,10 +122,11 @@ export default function ResultsPage() {
                     }}>
                         <div style={{ flex: 1, minWidth: 260 }}>
                             <div style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 6,
                                 fontSize: 12, color: '#B2DDE0', fontWeight: 600,
                                 textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 10,
                             }}>
-                                ✅ AI Analysis Complete
+                                <CheckCircle2 size={14} color="#B2DDE0" /> AI Analysis Complete
                             </div>
                             <h1 style={{
                                 fontFamily: "'Poppins',sans-serif",
@@ -119,29 +141,32 @@ export default function ResultsPage() {
                             </p>
                             <div style={{ marginTop: 18, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                                 <button onClick={resetAll} style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: 6,
                                     padding: '9px 20px', borderRadius: 9, fontSize: 13, fontWeight: 600,
                                     background: 'rgba(255,255,255,0.10)',
                                     color: '#fff', border: '1.5px solid rgba(255,255,255,0.25)',
                                     cursor: 'pointer', backdropFilter: 'blur(8px)',
                                 }}>
-                                    ← Recalculate
+                                    <ArrowLeft size={14} /> Recalculate
                                 </button>
                                 <Link to="/solar" style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: 6,
                                     padding: '9px 20px', borderRadius: 9, fontSize: 13, fontWeight: 600,
                                     background: 'linear-gradient(135deg,#C8932A,#a67420)',
                                     color: '#fff', border: 'none', cursor: 'pointer',
                                     textDecoration: 'none',
                                     boxShadow: '0 3px 12px rgba(200,147,42,0.35)',
                                 }}>
-                                    ☀️ Solar ROI Calculator
+                                    <Sun size={14} /> Solar ROI Calculator
                                 </Link>
                                 <Link to="/history" style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: 6,
                                     padding: '9px 20px', borderRadius: 9, fontSize: 13, fontWeight: 600,
                                     background: 'rgba(255,255,255,0.08)',
                                     color: '#B2DDE0', border: '1.5px solid rgba(178,221,224,0.25)',
                                     cursor: 'pointer', textDecoration: 'none',
                                 }}>
-                                    📈 View History
+                                    <TrendingUp size={14} /> View History
                                 </Link>
                             </div>
                         </div>
@@ -213,7 +238,9 @@ export default function ResultsPage() {
                                         border: '1.5px solid #C0392B30',
                                         borderRadius: 14, padding: '20px',
                                     }}>
-                                        <div style={{ fontSize: 24, marginBottom: 10 }}>🔴</div>
+                                        <div style={{ color: '#C0392B', marginBottom: 10, display: 'flex' }}>
+                                            <AlertCircle size={24} />
+                                        </div>
                                         <div style={{
                                             fontSize: 12, fontWeight: 700, color: '#C0392B',
                                             textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6
@@ -238,7 +265,12 @@ export default function ResultsPage() {
                                         border: '1.5px solid #0D768030',
                                         borderRadius: 14, padding: '20px',
                                     }}>
-                                        <div style={{ fontSize: 24, marginBottom: 10 }}>{cluster?.cluster_icon || '🏠'}</div>
+                                        <div style={{ color: '#0D7680', marginBottom: 10, display: 'flex' }}>
+                                            {(() => {
+                                                const Icon = iconMap[cluster?.cluster_icon] || Home;
+                                                return <Icon size={24} />;
+                                            })()}
+                                        </div>
                                         <div style={{
                                             fontSize: 12, fontWeight: 700, color: '#0D7680',
                                             textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6
@@ -263,7 +295,9 @@ export default function ResultsPage() {
                                         border: '1.5px solid #7B3F9E30',
                                         borderRadius: 14, padding: '20px',
                                     }}>
-                                        <div style={{ fontSize: 24, marginBottom: 10 }}>🌳</div>
+                                        <div style={{ color: '#7B3F9E', marginBottom: 10, display: 'flex' }}>
+                                            <Leaf size={24} />
+                                        </div>
                                         <div style={{
                                             fontSize: 12, fontWeight: 700, color: '#7B3F9E',
                                             textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6
@@ -288,7 +322,9 @@ export default function ResultsPage() {
                                         border: '1.5px solid #C8932A30',
                                         borderRadius: 14, padding: '20px',
                                     }}>
-                                        <div style={{ fontSize: 24, marginBottom: 10 }}>💡</div>
+                                        <div style={{ color: '#C8932A', marginBottom: 10, display: 'flex' }}>
+                                            <Lightbulb size={24} />
+                                        </div>
                                         <div style={{
                                             fontSize: 12, fontWeight: 700, color: '#C8932A',
                                             textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6
@@ -319,17 +355,18 @@ export default function ResultsPage() {
                                 </div>
                                 <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                                     {[
-                                        { tab: 'breakdown', label: '🔍 Breakdown' },
-                                        { tab: 'profile', label: '👥 Profile' },
-                                        { tab: 'simulator', label: '🎛️ Simulator' },
+                                        { tab: 'breakdown', label: 'Breakdown', icon: Search },
+                                        { tab: 'profile', label: 'Profile', icon: Users },
+                                        { tab: 'simulator', label: 'Simulator', icon: Sliders },
                                     ].map(b => (
                                         <button key={b.tab} onClick={() => setActiveTab(b.tab)} style={{
+                                            display: 'inline-flex', alignItems: 'center', gap: 6,
                                             padding: '9px 16px', borderRadius: 9, fontSize: 13, fontWeight: 600,
                                             background: 'rgba(13,118,128,0.25)',
                                             color: '#B2DDE0', border: '1px solid rgba(13,118,128,0.40)',
                                             cursor: 'pointer',
                                         }}>
-                                            {b.label}
+                                            <b.icon size={14} /> {b.label}
                                         </button>
                                     ))}
                                 </div>

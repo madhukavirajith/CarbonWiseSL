@@ -3,6 +3,7 @@ import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ApplianceForm from '../components/ApplianceForm';
 import { AppContext } from '../App';
+import { ClipboardList, Cpu, BarChart3, Lock } from 'lucide-react';
 
 export default function AppPage() {
     const { results } = useContext(AppContext);
@@ -12,6 +13,12 @@ export default function AppPage() {
     useEffect(() => {
         if (results) navigate('/results');
     }, []); // eslint-disable-line
+
+    const steps = [
+        { icon: ClipboardList, text: 'Enter Appliances', sub: '~3 minutes' },
+        { icon: Cpu, text: 'AI Calculates', sub: 'Instant' },
+        { icon: BarChart3, text: 'See Results', sub: 'Full breakdown' },
+    ];
 
     return (
         <div style={{ paddingTop: 80, background: '#F4F6F8', minHeight: '100vh' }}>
@@ -61,26 +68,31 @@ export default function AppPage() {
                     <div style={{
                         display: 'flex', gap: 20, marginTop: 28, flexWrap: 'wrap',
                     }}>
-                        {[
-                            { icon: '📋', text: 'Enter Appliances', sub: '~3 minutes' },
-                            { icon: '🤖', text: 'AI Calculates', sub: 'Instant' },
-                            { icon: '📊', text: 'See Results', sub: 'Full breakdown' },
-                        ].map((s, i) => (
-                            <div key={i} style={{
-                                display: 'flex', alignItems: 'center', gap: 10,
-                            }}>
-                                {i > 0 && (
-                                    <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.25)' }}>→</div>
-                                )}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <span style={{ fontSize: 18 }}>{s.icon}</span>
-                                    <div>
-                                        <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{s.text}</div>
-                                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{s.sub}</div>
+                        {steps.map((s, i) => {
+                            const Icon = s.icon;
+                            return (
+                                <div key={i} style={{
+                                    display: 'flex', alignItems: 'center', gap: 10,
+                                }}>
+                                    {i > 0 && (
+                                        <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.25)' }}>→</div>
+                                    )}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <span style={{ 
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            width: 32, height: 32, borderRadius: '50%', 
+                                            background: 'rgba(255,255,255,0.1)', color: '#fff' 
+                                        }}>
+                                            <Icon size={16} />
+                                        </span>
+                                        <div>
+                                            <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{s.text}</div>
+                                            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{s.sub}</div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </div>
@@ -102,7 +114,12 @@ export default function AppPage() {
                     background: '#fff', border: '1px solid #E8ECF0',
                     display: 'flex', gap: 12, alignItems: 'flex-start',
                 }}>
-                    <span style={{ fontSize: 18, flexShrink: 0 }}>🔒</span>
+                    <span style={{ 
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        color: '#8A9BB0', marginTop: 2, flexShrink: 0 
+                    }}>
+                        <Lock size={18} />
+                    </span>
                     <div style={{ fontSize: 12, color: '#8A9BB0', lineHeight: 1.7 }}>
                         <strong style={{ color: '#5A6A7A' }}>Privacy:</strong> Your appliance data
                         is only used for the AI prediction and is never stored permanently or shared.

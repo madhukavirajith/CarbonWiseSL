@@ -1,10 +1,13 @@
-// frontend/src/components/SummaryCards.js
 import React from 'react';
+import { 
+    CheckCircle2, AlertTriangle, AlertCircle, 
+    Calendar, CalendarDays, CalendarRange, Coins 
+} from 'lucide-react';
 
 const levelConfig = {
-    Low: { color: '#1A7A4A', bg: '#E8F5EE', icon: '🟢', label: 'Low Emissions' },
-    Medium: { color: '#C8932A', bg: '#FDF6E3', icon: '🟡', label: 'Medium Emissions' },
-    High: { color: '#C0392B', bg: '#FDECEA', icon: '🔴', label: 'High Emissions' },
+    Low: { color: '#1A7A4A', bg: '#E8F5EE', icon: CheckCircle2, label: 'Low Emissions' },
+    Medium: { color: '#C8932A', bg: '#FDF6E3', icon: AlertTriangle, label: 'Medium Emissions' },
+    High: { color: '#C0392B', bg: '#FDECEA', icon: AlertCircle, label: 'High Emissions' },
 };
 
 function MetricCard({ icon, label, value, unit, color, bg, sub, delay }) {
@@ -27,7 +30,7 @@ function MetricCard({ icon, label, value, unit, color, bg, sub, delay }) {
                 e.currentTarget.style.transform = 'none';
                 e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)';
             }}>
-            <div style={{ fontSize: 28, marginBottom: 10 }}>{icon}</div>
+            <div style={{ display: 'flex', alignItems: 'center', height: 32, marginBottom: 10 }}>{icon}</div>
             <div style={{
                 fontSize: 11, fontWeight: 700, color: color,
                 textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 6,
@@ -58,6 +61,7 @@ export default function SummaryCards({ prediction }) {
     } = prediction;
 
     const lvl = levelConfig[emission_level] || levelConfig.Medium;
+    const LvlIcon = lvl.icon;
     const vsSign = vs_average_pct > 0 ? '+' : '';
     const vsColor = vs_average_pct > 0 ? '#C0392B' : '#1A7A4A';
 
@@ -70,7 +74,7 @@ export default function SummaryCards({ prediction }) {
                 background: lvl.bg, border: `1.5px solid ${lvl.color}40`,
                 marginBottom: 20,
             }}>
-                <span style={{ fontSize: 28 }}>{lvl.icon}</span>
+                <LvlIcon size={28} color={lvl.color} />
                 <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 15, fontWeight: 700, color: lvl.color }}>
                         {lvl.label}
@@ -97,25 +101,25 @@ export default function SummaryCards({ prediction }) {
                 gap: 14,
             }}>
                 <MetricCard
-                    icon="📅" label="Daily CO₂" delay={0.05}
+                    icon={<Calendar size={24} color="#0D7680" />} label="Daily CO₂" delay={0.05}
                     value={daily_co2_kg} unit="kg"
                     color="#0D7680" bg="#E6F4F5"
                     sub="Carbon dioxide today" />
 
                 <MetricCard
-                    icon="📆" label="Monthly CO₂" delay={0.10}
+                    icon={<CalendarDays size={24} color="#7B3F9E" />} label="Monthly CO₂" delay={0.10}
                     value={monthly_co2_kg} unit="kg"
                     color="#7B3F9E" bg="#F3EBF8"
                     sub={`≈ ${Math.round(monthly_co2_kg / 0.52)} kWh consumed`} />
 
                 <MetricCard
-                    icon="🗓️" label="Annual CO₂" delay={0.15}
+                    icon={<CalendarRange size={24} color="#C0392B" />} label="Annual CO₂" delay={0.15}
                     value={annual_co2_kg} unit="kg"
                     color="#C0392B" bg="#FDECEA"
                     sub="Your yearly footprint" />
 
                 <MetricCard
-                    icon="💰" label="Monthly Bill" delay={0.20}
+                    icon={<Coins size={24} color="#C8932A" />} label="Monthly Bill" delay={0.20}
                     value={monthly_cost_lkr.toLocaleString()} unit="LKR"
                     color="#C8932A" bg="#FDF6E3"
                     sub="Estimated CEB bill" />
