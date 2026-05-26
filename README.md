@@ -1,7 +1,7 @@
 # CarbonWiseSL
 
 <p align="center">
-  <img src="assets/dashboard_mockup.png" alt="CarbonWiseSL Dashboard Mockup" width="100%" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
+  <img src="assets/homepage.png" alt="homepage" width="100%" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
 </p>
 
 <p align="center">
@@ -17,7 +17,7 @@
 </p>
 
 > [!NOTE]  
-> **Academic Context:** Developed as part of the **CIS6035 Software Engineering Development Project** for the **BSc (Hons) Software Engineering** / **BSc (Hons) Computer Science** program.  
+> **Academic Context:** Developed as part of the **CIS6035 Software Engineering Development Project** for the **BSc (Hons) Software Engineering** program.  
 > **Author:** Kuruppu Arachchige Madhuka Virajith (St20311741)  
 > **Methodology:** Agile Scrum — 8 Sprints (April 25 – August 10, 2025)
 
