@@ -45,7 +45,7 @@ const Tab = ({ id, label, icon: Icon, active, onClick }) => (
         boxShadow: active ? '0 3px 12px rgba(13,118,128,0.30)' : 'none',
     }}>
         <Icon size={16} />
-        <span style={{ display: window.innerWidth < 500 ? 'none' : 'block' }}>{label}</span>
+        <span className="tab-label">{label}</span>
     </button>
 );
 
@@ -116,10 +116,7 @@ export default function ResultsPage() {
                 }} />
 
                 <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-                    <div style={{
-                        display: 'flex', alignItems: 'flex-start',
-                        justifyContent: 'space-between', gap: 24, flexWrap: 'wrap',
-                    }}>
+                    <div className="results-header-flex">
                         <div style={{ flex: 1, minWidth: 260 }}>
                             <div style={{
                                 display: 'inline-flex', alignItems: 'center', gap: 6,
@@ -139,7 +136,7 @@ export default function ResultsPage() {
                                 Analysed with XGBoost regression · SHAP explainability · K-Means clustering.
                                 Results use SLSEA 2024 emission factors and CEB 2024 tariff rates.
                             </p>
-                            <div style={{ marginTop: 18, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                            <div style={{ marginTop: 18, display: 'flex', gap: 12, flexWrap: 'wrap' }} className="mobile-justify-center">
                                 <button onClick={resetAll} style={{
                                     display: 'inline-flex', alignItems: 'center', gap: 6,
                                     padding: '9px 20px', borderRadius: 9, fontSize: 13, fontWeight: 600,

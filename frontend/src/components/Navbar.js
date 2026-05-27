@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
-import { User, ArrowRight } from 'lucide-react';
+import { User, ArrowRight, Menu, X } from 'lucide-react';
 import { useSpring, animated } from '@react-spring/web';
 
 const S = {
-    nav: (scrolled) => ({
+    nav: (scrolled, isOpen) => ({
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
-        background: scrolled ? 'rgba(27,42,74,0.97)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled ? '1px solid rgba(178,221,224,0.15)' : 'none',
+        background: (scrolled || isOpen) ? 'rgba(27,42,74,0.97)' : 'transparent',
+        backdropFilter: (scrolled || isOpen) ? 'blur(12px)' : 'none',
+        borderBottom: (scrolled || isOpen) ? '1px solid rgba(178,221,224,0.15)' : 'none',
         transition: 'all 0.3s ease',
         padding: '0 24px',
     }),
@@ -63,6 +63,7 @@ const S = {
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const { user, logout } = useContext(AppContext);
@@ -83,7 +84,7 @@ export default function Navbar() {
     });
 
     return (
-        <nav style={S.nav(scrolled || !isLanding)}>
+        <nav style={S.nav(scrolled || !isLanding, isOpen)}>
             <div style={{
                 maxWidth: 1200, margin: '0 auto',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -94,6 +95,7 @@ export default function Navbar() {
                     style={S.logo}
                     onMouseEnter={() => setLogoHovered(true)}
                     onMouseLeave={() => setLogoHovered(false)}
+                    onClick={() => setIsOpen(false)}
                 >
                     <animated.div style={{ ...logoSpring, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                         <img src="/logo.png" alt="CarbonWiseSL Logo" className="logo-glow" style={{ width: 34, height: 34, objectFit: 'contain' }} />
@@ -101,18 +103,26 @@ export default function Navbar() {
                     CarbonWiseSL
                 </Link>
 
-                <div style={S.links}>
-                    <Link to="/calculate" style={S.link(path === '/calculate')}>Calculate</Link>
-                    <Link to="/solar" style={S.link(path === '/solar')}>Solar ROI</Link>
-                    <Link to="/history" style={S.link(path === '/history')}>History</Link>
+                <button 
+                    className="nav-toggle-btn"
+                    onClick={() => setIsOpen(!isOpen)}
+                    aria-label="Toggle navigation menu"
+                >
+                    {isOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+
+                <div className={`nav-menu ${isOpen ? 'is-open' : ''}`}>
+                    <Link to="/calculate" style={S.link(path === '/calculate')} onClick={() => setIsOpen(false)}>Calculate</Link>
+                    <Link to="/solar" style={S.link(path === '/solar')} onClick={() => setIsOpen(false)}>Solar ROI</Link>
+                    <Link to="/history" style={S.link(path === '/history')} onClick={() => setIsOpen(false)}>History</Link>
 
                     {user ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 8 }} className="nav-user-section">
                             <span style={S.usernameText}>
                                 <User size={14} /> {user.username}
                             </span>
                             <button
-                                onClick={() => { logout(); navigate('/'); }}
+                                onClick={() => { logout(); navigate('/'); setIsOpen(false); }}
                                 style={S.logoutBtn}
                                 onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(192, 57, 43, 0.2)'; e.currentTarget.style.borderColor = 'rgba(192, 57, 43, 0.4)'; e.currentTarget.style.color = '#FF8A80'; }}
                                 onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'; e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)'; e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)'; }}
@@ -121,9 +131,9 @@ export default function Navbar() {
                             </button>
                         </div>
                     ) : (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 8 }}>
-                            <Link to="/auth" style={S.link(path === '/auth')}>Sign In</Link>
-                            <Link to="/calculate" style={S.cta}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 8 }} className="nav-user-section">
+                            <Link to="/auth" style={S.link(path === '/auth')} onClick={() => setIsOpen(false)}>Sign In</Link>
+                            <Link to="/calculate" style={S.cta} onClick={() => setIsOpen(false)}>
                                 Get Started <ArrowRight size={14} />
                             </Link>
                         </div>

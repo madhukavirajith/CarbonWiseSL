@@ -346,7 +346,7 @@ export default function LandingPage() {
 
                 <div style={{ position: 'relative', zIndex: 1, width: '100%' }}>
                     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+                        <div className="responsive-hero-grid">
 
                             {/* Left — copy */}
                             <div>
@@ -433,9 +433,7 @@ export default function LandingPage() {
                         </div>
 
                         {/* Stats row */}
-                        <div style={{
-                            display: 'flex', gap: 16, marginTop: 72, flexWrap: 'wrap',
-                        }}>
+                        <div className="responsive-stats-grid" style={{ marginTop: 72 }}>
                             <StatCard value="0.52" label="kg CO₂ per kWh (SLSEA 2024)" icon={BarChart3} />
                             <StatCard value="38%" label="of SL electricity is residential" icon={Home} />
                             <StatCard value="5-Tier" label="CEB tariff modelled accurately" icon={Lightbulb} />
@@ -503,7 +501,7 @@ export default function LandingPage() {
             {/* ════════ HOW IT WORKS ════════ */}
             <section style={{ padding: '100px 0', background: '#fff' }}>
                 <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'center' }}>
+                    <div className="responsive-grid-2" style={{ alignItems: 'center' }}>
                         <div>
                             <div style={{
                                 display: 'inline-block', padding: '6px 18px', borderRadius: 100,

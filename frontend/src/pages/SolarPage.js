@@ -138,14 +138,12 @@ export default function SolarPage() {
             </div>
 
             <div style={{ maxWidth: 1000, margin: '-28px auto 60px', padding: '0 24px' }}>
-                <div style={{
-                    display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24,
-                }}>
+                <div className="responsive-grid-2">
                     {/* Form card */}
-                    <div style={{
+                    <div className="responsive-padding-card" style={{
                         background: '#fff', borderRadius: 20,
                         boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-                        border: '1px solid #E8ECF0', padding: '32px',
+                        border: '1px solid #E8ECF0',
                     }}>
                         <h2 style={{
                             fontSize: 18, fontWeight: 800, color: '#1B2A4A',
@@ -284,10 +282,7 @@ export default function SolarPage() {
                                     </p>
                                 </div>
 
-                                <div style={{
-                                    display: 'grid', gridTemplateColumns: '1fr 1fr',
-                                    gap: 12, marginBottom: 16,
-                                }}>
+                                <div className="responsive-grid-2" style={{ gap: 12, marginBottom: 16 }}>
                                     <ResultCard
                                         icon={Zap} label="Annual Generation"
                                         value={result.annual_kwh_generated.toLocaleString()}

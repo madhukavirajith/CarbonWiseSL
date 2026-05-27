@@ -56,10 +56,7 @@ export default function TrendChart({ records }) {
     return (
         <div>
             {/* Mini stats */}
-            <div style={{
-                display: 'grid', gridTemplateColumns: 'repeat(4,1fr)',
-                gap: 10, marginBottom: 20,
-            }}>
+            <div className="trend-stats-grid" style={{ marginBottom: 20 }}>
                 {[
                     { label: 'Latest', value: `${latest} kg`, color: '#0D7680' },
                     { label: 'Average', value: `${avg.toFixed(2)} kg`, color: '#7B3F9E' },

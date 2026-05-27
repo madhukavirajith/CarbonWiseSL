@@ -116,7 +116,7 @@ const SectionCard = ({ title, icon, children }) => (
 );
 
 const Grid2 = ({ children }) => (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+    <div className="form-grid-2">
         {children}
     </div>
 );
@@ -205,10 +205,9 @@ export default function ApplianceForm() {
                                 color: i <= step ? '#fff' : '#8A9BB0',
                                 transition: 'all 0.3s',
                             }}>{i + 1}</div>
-                            <span style={{
+                            <span className="step-label" style={{
                                 fontSize: 12, fontWeight: 600,
                                 color: i === step ? '#0D7680' : '#8A9BB0',
-                                display: window.innerWidth < 600 ? 'none' : 'block'
                             }}>{s}</span>
                         </div>
                     ))}
@@ -473,7 +472,7 @@ export default function ApplianceForm() {
                             <BarChart3 size={16} />
                             <span>Quick Estimate Preview</span>
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                        <div className="form-grid-2">
                             <div>
                                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.50)', marginBottom: 4 }}>
                                     Est. Daily kWh

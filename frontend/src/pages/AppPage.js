@@ -99,12 +99,7 @@ export default function AppPage() {
 
             {/* Pull-up card */}
             <div style={{ maxWidth: 860, margin: '-28px auto 60px', padding: '0 24px' }}>
-                <div style={{
-                    background: '#fff', borderRadius: 20,
-                    boxShadow: '0 8px 40px rgba(0,0,0,0.10)',
-                    border: '1px solid #E8ECF0',
-                    padding: '36px 40px',
-                }}>
+                <div className="form-card">
                     <ApplianceForm />
                 </div>
 

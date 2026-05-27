@@ -251,26 +251,30 @@ export default function HistoryPage() {
                             boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
                             border: '1px solid #E8ECF0', overflow: 'hidden',
                         }}>
-                            {/* Table header */}
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: '120px 1fr 1fr 1fr 1fr',
-                                gap: 12, padding: '14px 20px',
-                                background: '#F4F6F8',
-                                borderBottom: '1px solid #E8ECF0',
-                                fontSize: 11, fontWeight: 700, color: '#8A9BB0',
-                                textTransform: 'uppercase', letterSpacing: 1,
-                            }}>
-                                <span>Date</span>
-                                <span>Level</span>
-                                <span>Daily CO₂</span>
-                                <span>Monthly CO₂</span>
-                                <span>Est. Bill</span>
-                            </div>
+                            <div className="table-responsive-wrapper">
+                                <div style={{ minWidth: 600 }}>
+                                    {/* Table header */}
+                                    <div style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: '120px 1fr 1fr 1fr 1fr',
+                                        gap: 12, padding: '14px 20px',
+                                        background: '#F4F6F8',
+                                        borderBottom: '1px solid #E8ECF0',
+                                        fontSize: 11, fontWeight: 700, color: '#8A9BB0',
+                                        textTransform: 'uppercase', letterSpacing: 1,
+                                    }}>
+                                        <span>Date</span>
+                                        <span>Level</span>
+                                        <span>Daily CO₂</span>
+                                        <span>Monthly CO₂</span>
+                                        <span>Est. Bill</span>
+                                    </div>
 
-                            {[...records].reverse().map((r, i) => (
-                                <HistoryRow key={i} record={r} index={i} />
-                            ))}
+                                    {[...records].reverse().map((r, i) => (
+                                        <HistoryRow key={i} record={r} index={i} />
+                                    ))}
+                                </div>
+                            </div>
                         </div>
 
                         {/* Recalculate CTA */}
