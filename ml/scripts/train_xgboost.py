@@ -38,7 +38,7 @@ os.makedirs(MODELS_DIR, exist_ok=True)
 # ─────────────────────────────────────────────────────────────────────────────
 def train(df):
     print("\n" + "=" * 60)
-    print("XGBoost Training — CarbonWise SL")
+    print("XGBoost Training - CarbonWise SL")
     print("=" * 60)
 
     # Feature engineering
@@ -111,7 +111,7 @@ def train(df):
     plt.figure(figsize=(9, 6))
     importances.plot(kind='barh', color='#0D7680')
     plt.xlabel('Importance Score')
-    plt.title('XGBoost Feature Importance — CarbonWise SL')
+    plt.title('XGBoost Feature Importance - CarbonWise SL')
     plt.tight_layout()
     chart_path = os.path.join(MODELS_DIR, 'feature_importance.png')
     plt.savefig(chart_path, dpi=150)

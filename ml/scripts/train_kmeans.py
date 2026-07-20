@@ -56,19 +56,19 @@ CLUSTER_ICONS = {
 
 CLUSTER_RECOMMENDATIONS = {
     0: [
-        'Your AC is your biggest emission source — setting it to 26°C instead of 22°C cuts AC emissions by up to 30%.',
+        'Your AC is your biggest emission source - setting it to 26°C instead of 22°C cuts AC emissions by up to 30%.',
         'Use a sleep timer so your AC turns off automatically 30 minutes after you sleep.',
-        'Consider upgrading to an inverter AC — it uses 40% less electricity than a non-inverter model.',
+        'Consider upgrading to an inverter AC - it uses 40% less electricity than a non-inverter model.',
     ],
     1: [
         'Your household is already energy-efficient. Focus on replacing any remaining old bulbs with LED.',
-        'Check your refrigerator door seals — worn seals waste up to 15% more electricity continuously.',
+        'Check your refrigerator door seals - worn seals waste up to 15% more electricity continuously.',
         'Shift your washing machine to off-peak hours (before 6 PM or after 10 PM) to benefit from lower CEB tariff rates.',
     ],
     2: [
-        'With more occupants, standby power from multiple devices adds up — unplug chargers when not in use.',
+        'With more occupants, standby power from multiple devices adds up - unplug chargers when not in use.',
         'A rooftop solar installation would give your household strong financial returns given your high consumption level.',
-        'Coordinate heavy appliance use — avoid running the washing machine and water heater at the same time.',
+        'Coordinate heavy appliance use - avoid running the washing machine and water heater at the same time.',
     ],
 }
 
@@ -107,14 +107,14 @@ def find_best_k(X_scaled, k_range=range(2, 9)):
 
 def train(df, best_k=None):
     print("\n" + "=" * 60)
-    print("K-Means Training — CarbonWise SL")
+    print("K-Means Training - CarbonWise SL")
     print("=" * 60)
 
     # Build feature matrix for clustering
     available = [c for c in CLUSTER_FEATURES if c in df.columns]
     missing   = [c for c in CLUSTER_FEATURES if c not in df.columns]
     if missing:
-        print(f"Warning — filling missing columns with 0: {missing}")
+        print(f"Warning - filling missing columns with 0: {missing}")
         for col in missing:
             df[col] = 0
 
@@ -141,7 +141,7 @@ def train(df, best_k=None):
     df = df.copy()
     df['cluster'] = kmeans.labels_
 
-    # Cluster summary — read this to verify/rename cluster labels
+    # Cluster summary - read this to verify/rename cluster labels
     summary_cols = [c for c in ['daily_kwh_raw', 'has_ac', 'ac_hours',
                                  'heater_hours', 'occupants',
                                  'ceb_units', 'daily_co2_kg'] if c in df.columns]

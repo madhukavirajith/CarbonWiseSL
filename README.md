@@ -19,7 +19,7 @@
 > [!NOTE]  
 > **Academic Context:** Developed as part of the **CIS6035 Software Engineering Development Project** for the **BSc (Hons) Software Engineering** program.  
 > **Author:** Kuruppu Arachchige Madhuka Virajith (St20311741)  
-> **Methodology:** Agile Scrum — 8 Sprints (April 25 – August 10, 2025)
+> **Methodology:** Agile Scrum - 8 Sprints (April 25 – August 10, 2025)
 
 ---
 

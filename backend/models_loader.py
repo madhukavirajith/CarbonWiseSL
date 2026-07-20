@@ -40,7 +40,7 @@ MODEL_STATUS = {
 logger.info(f"Model status: {MODEL_STATUS}")
 
 # ── Constants ──────────────────────────────────────────────────────────────
-SL_EMISSION_FACTOR = 0.52   # kg CO2 per kWh — SLSEA 2024
+SL_EMISSION_FACTOR = 0.52   # kg CO2 per kWh - SLSEA 2024
 
 SOLAR_IRRADIANCE = {
     "Colombo": 4.5,
@@ -48,13 +48,7 @@ SOLAR_IRRADIANCE = {
     "Galle":   4.6,
 }
 
-CEB_TARIFF_BANDS = [
-    (0,   60,  2.50),
-    (60,  90,  4.85),
-    (90,  120, 7.85),
-    (120, 180, 10.00),
-    (180, 9999,12.00),
-]
+# Outdated 2014 tariff bands, replaced by May 2026 tariff structures
 
 FRIDGE_KWH = {
     "Small (under 200L)": 0.08 * 24,
@@ -122,19 +116,147 @@ FEATURE_LABELS = {
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 def get_ceb_cost(units: float) -> float:
-    cost = 0.0
-    prev = 0.0
-    for low, high, rate in CEB_TARIFF_BANDS:
-        if units <= low:
-            break
-        applicable = min(units, high) - low
-        cost += applicable * rate
-        prev = low
-    return round(cost, 2)
+    """
+    Calculate domestic CEB bill based on the newly approved May 11, 2026 tariff.
+    Handles three consumption categories:
+    1. 0-60 kWh
+    2. Above 60-180 kWh
+    3. Above 180 kWh
+    Applies 2.5% SSCL (using effective rate 2.5/97.5), 18% VAT, and 10.00 LKR meter rent.
+    """
+    if units <= 0:
+        return 0.0
+
+    base_bill = 0.0
+    fixed_charge = 0.0
+
+    if units <= 60:
+        # Consumption 0-60 kWh per month
+        if units <= 30:
+            base_bill = units * 5.00
+            fixed_charge = 80.00
+        else:
+            base_bill = (30 * 5.00) + ((units - 30) * 9.00)
+            fixed_charge = 210.00
+    elif units <= 180:
+        # Consumption above 60-180 kWh per month
+        # Energy charge is cumulative block-wise
+        rem = units
+        # Block 1: 0-60
+        b1 = min(rem, 60.0)
+        base_bill += b1 * 14.00
+        rem -= b1
+        
+        # Block 2: 61-90
+        if rem > 0:
+            b2 = min(rem, 30.0)
+            base_bill += b2 * 20.00
+            rem -= b2
+            
+        # Block 3: 91-120
+        if rem > 0:
+            b3 = min(rem, 30.0)
+            base_bill += b3 * 28.00
+            rem -= b3
+            
+        # Block 4: 121-180
+        if rem > 0:
+            b4 = min(rem, 60.0)
+            base_bill += b4 * 44.00
+            rem -= b4
+            
+        # Determine fixed charge based on total consumption
+        if units <= 90:
+            fixed_charge = 400.00
+        elif units <= 120:
+            fixed_charge = 1000.00
+        else:
+            fixed_charge = 1500.00
+            
+    else:
+        # Consumption above 180 kWh per month
+        # Block 1: 0-180 @ 32.50
+        # Block 2: Above 180 @ 100.00
+        base_bill += 180.0 * 32.50
+        base_bill += (units - 180.0) * 100.00
+        fixed_charge = 2500.00
+
+    subtotal = base_bill + fixed_charge
+
+    # Apply 2.5% SSCL on turnover (taxable base grossed up by 2.5/97.5)
+    sscl = subtotal * (2.5 / 97.5)
+    # Apply 18% VAT on top of (Subtotal + SSCL)
+    vat = (subtotal + sscl) * 0.18
+    # Standard 10.00 LKR meter rent
+    meter_rent = 10.00
+
+    total_bill = subtotal + sscl + vat + meter_rent
+    return round(total_bill, 2)
+
+
+def get_ceb_cost_july2024(units: float) -> float:
+    """
+    Calculate domestic CEB bill based on the July 16, 2024 to May 10, 2026 tariff.
+    Provided for reference and validation.
+    """
+    if units <= 0:
+        return 0.0
+
+    base_bill = 0.0
+    fixed_charge = 0.0
+
+    if units <= 60:
+        if units <= 30:
+            base_bill = units * 6.00
+            fixed_charge = 100.00
+        else:
+            base_bill = (30 * 6.00) + ((units - 30) * 9.00)
+            fixed_charge = 250.00
+    else:
+        rem = units
+        # Block 1: 0-60
+        b1 = min(rem, 60.0)
+        base_bill += b1 * 15.00
+        rem -= b1
+        # Block 2: 61-90
+        if rem > 0:
+            b2 = min(rem, 30.0)
+            base_bill += b2 * 18.00
+            rem -= b2
+        # Block 3: 91-120
+        if rem > 0:
+            b3 = min(rem, 30.0)
+            base_bill += b3 * 30.00
+            rem -= b3
+        # Block 4: 121-180
+        if rem > 0:
+            b4 = min(rem, 60.0)
+            base_bill += b4 * 42.00
+            rem -= b4
+        # Block 5: Above 180
+        if rem > 0:
+            base_bill += rem * 65.00
+
+        # Fixed charges
+        if units <= 90:
+            fixed_charge = 400.00
+        elif units <= 120:
+            fixed_charge = 1000.00
+        elif units <= 180:
+            fixed_charge = 1500.00
+        else:
+            fixed_charge = 2000.00
+
+    subtotal = base_bill + fixed_charge
+    sscl = subtotal * (2.5 / 97.5)
+    vat = (subtotal + sscl) * 0.18
+    meter_rent = 10.00
+    total_bill = subtotal + sscl + vat + meter_rent
+    return round(total_bill, 2)
 
 
 def input_to_features(data) -> list:
-    """Convert ApplianceInput Pydantic model to ordered feature list (34 features)."""
+    """Convert ApplianceInput Pydantic model to ordered feature list (33 features)."""
     city_enc = 0
     if city_encoder is not None:
         try:
@@ -144,7 +266,6 @@ def input_to_features(data) -> list:
 
     row = [
         float(data.occupants),
-        float(data.ceb_units),
         float(data.has_ac),
         float(data.ac_rooms),
         float(data.ac_hours),

@@ -17,7 +17,7 @@ env/
 .venv/
 .env/
 
-# ── Environment variables — NEVER commit these ────────────────────
+# ── Environment variables - NEVER commit these ────────────────────
 .env
 .env.local
 .env.production
@@ -26,7 +26,7 @@ backend/.env
 frontend/.env
 backend/serviceAccountKey.json
 
-# ── Model files — too large for Git, keep in Google Drive ─────────
+# ── Model files - too large for Git, keep in Google Drive ─────────
 *.pkl
 *.h5
 *.tflite

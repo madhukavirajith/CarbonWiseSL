@@ -348,7 +348,7 @@ export default function LandingPage() {
                     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 24px' }}>
                         <div className="responsive-hero-grid">
 
-                            {/* Left — copy */}
+                            {/* Left - copy */}
                             <div>
 
                                 <animated.div style={trail[1]}>
@@ -403,7 +403,7 @@ export default function LandingPage() {
 
                             </div>
 
-                            {/* Right — animated banner image */}
+                            {/* Right - animated banner image */}
                             <animated.div style={mockupSpring}>
                                 <div className="animate-float">
                                     <animated.div
@@ -436,7 +436,7 @@ export default function LandingPage() {
                         <div className="responsive-stats-grid" style={{ marginTop: 72 }}>
                             <StatCard value="0.52" label="kg CO₂ per kWh (SLSEA 2024)" icon={BarChart3} />
                             <StatCard value="38%" label="of SL electricity is residential" icon={Home} />
-                            <StatCard value="5-Tier" label="CEB tariff modelled accurately" icon={Lightbulb} />
+                            <StatCard value="Multi-Tier" label="CEB tariff modelled accurately" icon={Lightbulb} />
                             <StatCard value="Free" label="No registration required" icon={CheckCircle2} />
                         </div>
                     </div>
@@ -525,7 +525,7 @@ export default function LandingPage() {
                             </div>
                         </div>
 
-                        {/* Right side — AI intro video */}
+                        {/* Right side - AI intro video */}
                         <div style={{
                             background: 'linear-gradient(145deg,#1B2A4A,#0D3B45)',
                             borderRadius: 24,
@@ -574,7 +574,7 @@ export default function LandingPage() {
                             quote="The solar calculator showed me my rooftop would pay back in 6.2 years. I've now applied for a solar loan. No other tool gave me this clearly with Sri Lankan data." />
                         <TestimonialCard
                             icon={Users} name="Fernando Family" area="Galle"
-                            quote="The what-if simulator let us experiment before making any changes. We replaced 4 old bulbs and reduced the washing machine loads — 0.7 kg CO₂ less per day, which we can see in the history chart." />
+                            quote="The what-if simulator let us experiment before making any changes. We replaced 4 old bulbs and reduced the washing machine loads - 0.7 kg CO₂ less per day, which we can see in the history chart." />
                     </div>
                 </div>
             </section>
@@ -603,7 +603,7 @@ export default function LandingPage() {
                         <Btn to="/solar" variant="secondary"><Sun size={16} /> Solar ROI Calculator</Btn>
                     </div>
                     <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 28 }}>
-                        Data source: SLSEA Grid Emission Factor 2024 · CEB Domestic Tariff 2024 · IPCC AR6
+                        Data source: SLSEA Grid Emission Factor 2024 · CEB Domestic Tariff May 2026 · IPCC AR6
                     </p>
                 </div>
             </section>

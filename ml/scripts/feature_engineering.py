@@ -2,7 +2,7 @@
 """
 Converts cleaned survey data into the feature matrix used by XGBoost.
 The FEATURE_COLUMNS list here must exactly match what models_loader.py
-uses in the backend — same order, same names.
+uses in the backend - same order, same names.
 """
 
 import pandas as pd
@@ -10,10 +10,9 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
 
-# ── Feature column order — must match backend/models_loader.py ────────────
+# ── Feature column order - must match backend/models_loader.py ────────────
 FEATURE_COLUMNS = [
     'occupants',
-    'ceb_units',
     'has_ac',
     'ac_rooms',
     'ac_hours',
@@ -82,9 +81,9 @@ PC_KW = {
 def engineer_features(df, fit_encoder=True, city_encoder=None):
     """
     Takes a cleaned survey DataFrame and returns:
-        X             — feature matrix (DataFrame with FEATURE_COLUMNS)
-        y             — target series (daily_co2_kg), or None if not present
-        city_encoder  — fitted LabelEncoder for the city column
+        X             - feature matrix (DataFrame with FEATURE_COLUMNS)
+        y             - target series (daily_co2_kg), or None if not present
+        city_encoder  - fitted LabelEncoder for the city column
 
     Parameters
     ----------

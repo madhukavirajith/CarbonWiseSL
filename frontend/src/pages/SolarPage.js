@@ -117,10 +117,7 @@ export default function SolarPage() {
                         border: '1px solid rgba(200,147,42,0.40)',
                         borderRadius: 100, padding: '5px 14px', marginBottom: 18,
                     }}>
-                        <Sun size={14} color="#FDF6E3" />
-                        <span style={{ fontSize: 12, color: '#FDF6E3', fontWeight: 600 }}>
-                            Uses SLSEA Solar Irradiance Data — Colombo, Kandy, Galle
-                        </span>
+
                     </div>
                     <h1 style={{
                         fontFamily: "'Poppins',sans-serif",
@@ -132,7 +129,7 @@ export default function SolarPage() {
                     <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', maxWidth: 520, lineHeight: 1.7 }}>
                         Find out whether rooftop solar makes financial sense for your Sri Lankan home.
                         Enter your roof area and city, get annual generation, bill savings, CO₂ offset,
-                        and payback period — all using official SLSEA data.
+                        and payback period - all using official SLSEA data.
                     </p>
                 </div>
             </div>
@@ -199,7 +196,7 @@ export default function SolarPage() {
                                 padding: '14px 16px', borderRadius: 10,
                                 background: '#FDF6E3', border: '1px solid #C8932A30',
                                 marginBottom: 20, fontSize: 13,
-                             }}>
+                            }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, color: '#C8932A', marginBottom: 4 }}>
                                     <Sun size={14} /> Quick Estimate
                                 </div>
@@ -275,7 +272,7 @@ export default function SolarPage() {
                                         fontSize: 18, fontWeight: 800, color: '#1B2A4A',
                                         fontFamily: "'Poppins',sans-serif", marginBottom: 4,
                                     }}>
-                                        Solar ROI Results — {result.city}
+                                        Solar ROI Results - {result.city}
                                     </h2>
                                     <p style={{ fontSize: 13, color: '#8A9BB0' }}>
                                         {result.system_size_kw} kW system · {result.irradiance_used} kWh/m²/day
@@ -338,7 +335,7 @@ export default function SolarPage() {
                                             } else {
                                                 return (
                                                     <>
-                                                        <AlertTriangle size={16} /> Marginal — Consider Smaller System
+                                                        <AlertTriangle size={16} /> Marginal - Consider Smaller System
                                                     </>
                                                 );
                                             }

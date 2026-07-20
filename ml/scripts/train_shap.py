@@ -84,7 +84,7 @@ def build_shap_explainer():
     shap_values = explainer.shap_values(X.iloc[:10])
     print(f"SHAP values shape : {shap_values.shape}")
 
-    # Mean absolute SHAP — shows which features matter most overall
+    # Mean absolute SHAP - shows which features matter most overall
     mean_abs = np.abs(shap_values).mean(axis=0)
     ranked = sorted(
         zip(FEATURE_COLUMNS, mean_abs),
@@ -104,7 +104,7 @@ def build_shap_explainer():
         feature_names=FEATURE_COLUMNS,
         show=False,
     )
-    plt.title('SHAP Summary — CarbonWise SL XGBoost')
+    plt.title('SHAP Summary - CarbonWise SL XGBoost')
     plt.tight_layout()
     summary_path = os.path.join(MODELS_DIR, 'shap_summary.png')
     plt.savefig(summary_path, dpi=150, bbox_inches='tight')
@@ -115,7 +115,7 @@ def build_shap_explainer():
     explanation = explainer(X.iloc[:1])
     plt.figure(figsize=(10, 6))
     shap.plots.waterfall(explanation[0], show=False)
-    plt.title('SHAP Waterfall — Sample Household')
+    plt.title('SHAP Waterfall - Sample Household')
     plt.tight_layout()
     waterfall_path = os.path.join(MODELS_DIR, 'shap_waterfall_sample.png')
     plt.savefig(waterfall_path, dpi=150, bbox_inches='tight')

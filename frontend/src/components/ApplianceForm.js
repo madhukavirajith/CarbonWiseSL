@@ -1,10 +1,10 @@
 // frontend/src/components/ApplianceForm.js
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-    Home, Refrigerator, Snowflake, Fan, ShowerHead, Tv, WashingMachine, 
-    Laptop, CookingPot, Microwave, Shirt, ChefHat, Lightbulb, Sun, 
-    BarChart3, AlertTriangle, Zap, ArrowLeft, ArrowRight 
+import {
+    Home, Refrigerator, Snowflake, Fan, ShowerHead, Tv, WashingMachine,
+    Laptop, CookingPot, Microwave, Shirt, ChefHat, Lightbulb, Sun,
+    BarChart3, AlertTriangle, Zap, ArrowLeft, ArrowRight
 } from 'lucide-react';
 import { predictEmissions, explainPrediction, getCluster } from '../api';
 import { AppContext } from '../App';
@@ -186,7 +186,7 @@ export default function ApplianceForm() {
         }
     };
 
-    if (loading) return <Loader message="Running AI models — XGBoost · SHAP · K-Means…" />;
+    if (loading) return <Loader message="Running AI models - XGBoost · SHAP · K-Means…" />;
 
     const steps = ['Household', 'Cooling & Heating', 'Appliances', 'Lighting & Other'];
 

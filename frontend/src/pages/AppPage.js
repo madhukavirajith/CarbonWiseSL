@@ -47,9 +47,6 @@ export default function AppPage() {
                             background: '#0D7680', display: 'block',
                             animation: 'pulse 2s infinite'
                         }} />
-                        <span style={{ fontSize: 12, color: '#B2DDE0', fontWeight: 600 }}>
-                            AI Models Ready — XGBoost + SHAP + K-Means
-                        </span>
                     </div>
 
                     <h1 style={{
@@ -78,10 +75,10 @@ export default function AppPage() {
                                         <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.25)' }}>→</div>
                                     )}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        <span style={{ 
+                                        <span style={{
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            width: 32, height: 32, borderRadius: '50%', 
-                                            background: 'rgba(255,255,255,0.1)', color: '#fff' 
+                                            width: 32, height: 32, borderRadius: '50%',
+                                            background: 'rgba(255,255,255,0.1)', color: '#fff'
                                         }}>
                                             <Icon size={16} />
                                         </span>
@@ -109,16 +106,16 @@ export default function AppPage() {
                     background: '#fff', border: '1px solid #E8ECF0',
                     display: 'flex', gap: 12, alignItems: 'flex-start',
                 }}>
-                    <span style={{ 
+                    <span style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#8A9BB0', marginTop: 2, flexShrink: 0 
+                        color: '#8A9BB0', marginTop: 2, flexShrink: 0
                     }}>
                         <Lock size={18} />
                     </span>
                     <div style={{ fontSize: 12, color: '#8A9BB0', lineHeight: 1.7 }}>
                         <strong style={{ color: '#5A6A7A' }}>Privacy:</strong> Your appliance data
                         is only used for the AI prediction and is never stored permanently or shared.
-                        Emission factors from SLSEA 2024 · CEB Domestic Tariff 2024.
+                        Emission factors from SLSEA 2024 · CEB Domestic Tariff May 2026.
                     </div>
                 </div>
             </div>

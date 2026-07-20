@@ -42,20 +42,20 @@ function HistoryRow({ record, index }) {
                     fontSize: 13, fontWeight: 700, color: lvl.color,
                     background: lvl.bg, padding: '3px 10px', borderRadius: 100,
                 }}>
-                    {p.emission_level || '—'}
+                    {p.emission_level || '-'}
                 </span>
             </div>
 
             <div style={{ fontSize: 14, fontWeight: 700, color: '#1B2A4A' }}>
-                {p.daily_co2_kg ?? '—'} <span style={{ fontSize: 11, color: '#8A9BB0', fontWeight: 400 }}>kg/day</span>
+                {p.daily_co2_kg ?? '-'} <span style={{ fontSize: 11, color: '#8A9BB0', fontWeight: 400 }}>kg/day</span>
             </div>
 
             <div style={{ fontSize: 14, fontWeight: 700, color: '#0D7680' }}>
-                {p.monthly_co2_kg ?? '—'} <span style={{ fontSize: 11, color: '#8A9BB0', fontWeight: 400 }}>kg/mo</span>
+                {p.monthly_co2_kg ?? '-'} <span style={{ fontSize: 11, color: '#8A9BB0', fontWeight: 400 }}>kg/mo</span>
             </div>
 
             <div style={{ fontSize: 13, color: '#C8932A', fontWeight: 600 }}>
-                LKR {p.monthly_cost_lkr?.toLocaleString() ?? '—'}
+                LKR {p.monthly_cost_lkr?.toLocaleString() ?? '-'}
             </div>
         </div>
     );
@@ -84,9 +84,9 @@ export default function HistoryPage() {
     const co2Values = records.map(r => r.prediction?.daily_co2_kg ?? 0).filter(Boolean);
     const avgCo2 = co2Values.length
         ? (co2Values.reduce((a, b) => a + b, 0) / co2Values.length).toFixed(2)
-        : '—';
-    const bestCo2 = co2Values.length ? Math.min(...co2Values) : '—';
-    const latestCo2 = co2Values.length ? co2Values[co2Values.length - 1] : '—';
+        : '-';
+    const bestCo2 = co2Values.length ? Math.min(...co2Values) : '-';
+    const latestCo2 = co2Values.length ? co2Values[co2Values.length - 1] : '-';
     const trend = co2Values.length > 1
         ? (latestCo2 - co2Values[0]).toFixed(2)
         : null;

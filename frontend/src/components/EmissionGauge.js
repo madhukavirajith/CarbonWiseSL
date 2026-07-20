@@ -12,7 +12,7 @@ export default function EmissionGauge({ daily_co2, emission_level }) {
     };
     const [dark, light] = levelColors[emission_level] || levelColors.Medium;
 
-    // SVG arc gauge — 180° semicircle
+    // SVG arc gauge - 180° semicircle
     const r = 70;
     const cx = 100, cy = 95;
     const startAngle = -180;

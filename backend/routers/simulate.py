@@ -42,7 +42,7 @@ def simulate(data: SimulationInput):
     elif sc == "washer_shift":
         modified.washer_loads = max(0.0, float(nv))
     elif sc == "standby":
-        # Eliminating standby — reduce computer and TV hours slightly
+        # Eliminating standby - reduce computer and TV hours slightly
         modified.computer_hours = max(0.0, modified.computer_hours - 1.0)
         modified.tv_hours       = max(0.0, modified.tv_hours - 0.5)
 
@@ -55,7 +55,9 @@ def simulate(data: SimulationInput):
     saving_day   = orig_co2 - new_co2
     saving_month = saving_day * 30
     kwh_saving   = saving_day / ml.SL_EMISSION_FACTOR
-    cost_saving  = kwh_saving * 10.0 * 30   # LKR per month approx
+    orig_cost    = ml.get_ceb_cost(base.ceb_units)
+    new_cost     = ml.get_ceb_cost(max(0.0, base.ceb_units - kwh_saving * 30))
+    cost_saving  = orig_cost - new_cost
     saving_pct   = round(saving_day / (orig_co2 + 1e-9) * 100, 1)
 
     if saving_pct > 20:

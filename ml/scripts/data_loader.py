@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 
-SL_EMISSION_FACTOR = 0.52   # kg CO2 per kWh — SLSEA 2024
+SL_EMISSION_FACTOR = 0.52   # kg CO2 per kWh - SLSEA 2024
 
 
 if '__file__' in globals():

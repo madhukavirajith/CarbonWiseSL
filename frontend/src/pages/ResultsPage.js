@@ -82,7 +82,7 @@ export default function ResultsPage() {
             user_id: userId,
             prediction: { ...results.prediction, timestamp: results.timestamp },
             appliances: formData || {},
-        }).catch(() => { }); // silent fail — history is best-effort
+        }).catch(() => { }); // silent fail - history is best-effort
         setSaved(true);
     }, [results, saved, userId, formData]);
 
@@ -134,7 +134,7 @@ export default function ResultsPage() {
                             </h1>
                             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.60)', lineHeight: 1.7, maxWidth: 480 }}>
                                 Analysed with XGBoost regression · SHAP explainability · K-Means clustering.
-                                Results use SLSEA 2024 emission factors and CEB 2024 tariff rates.
+                                Results use SLSEA 2024 emission factors and approved CEB May 2026 tariff rates.
                             </p>
                             <div style={{ marginTop: 18, display: 'flex', gap: 12, flexWrap: 'wrap' }} className="mobile-justify-center">
                                 <button onClick={resetAll} style={{
@@ -248,7 +248,7 @@ export default function ResultsPage() {
                                             fontSize: 18, fontWeight: 800, color: '#1B2A4A',
                                             fontFamily: "'Poppins',sans-serif", marginBottom: 6
                                         }}>
-                                            {explanation?.top_culprit || '—'}
+                                            {explanation?.top_culprit || '-'}
                                         </div>
                                         <div style={{ fontSize: 13, color: '#5A6A7A', lineHeight: 1.6 }}>
                                             This appliance contributes the most to your total CO₂ emissions
@@ -278,7 +278,7 @@ export default function ResultsPage() {
                                             fontSize: 18, fontWeight: 800, color: '#1B2A4A',
                                             fontFamily: "'Poppins',sans-serif", marginBottom: 6
                                         }}>
-                                            {cluster?.cluster_name || '—'}
+                                            {cluster?.cluster_name || '-'}
                                         </div>
                                         <div style={{ fontSize: 13, color: '#5A6A7A', lineHeight: 1.6 }}>
                                             Your usage pattern was classified by K-Means AI into this household
@@ -377,7 +377,7 @@ export default function ResultsPage() {
                     <div className="animate-fadeIn">
                         <Section
                             title="SHAP Appliance Breakdown"
-                            subtitle="Powered by SHAP (SHapley Additive exPlanations) — showing each appliance's exact contribution to your predicted CO₂"
+                            subtitle="Powered by SHAP (SHapley Additive exPlanations) - showing each appliance's exact contribution to your predicted CO₂"
                         >
                             <ShapChart explanation={explanation} />
                         </Section>
