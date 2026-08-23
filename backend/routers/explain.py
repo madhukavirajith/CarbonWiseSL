@@ -39,7 +39,7 @@ def explain_prediction(data: ApplianceInput):
     results.sort(key=lambda x: abs(x.shap_value), reverse=True)
 
     # Filter out non-appliance inputs for the "Biggest Culprit" card
-    exclude_culprits = {"ceb_units", "occupants", "city_encoded"}
+    exclude_culprits = {"occupants", "city_encoded"}
     appliance_results = [r for r in results if r.feature not in exclude_culprits]
     top_culprit = appliance_results[0].label if appliance_results else "Unknown"
 
