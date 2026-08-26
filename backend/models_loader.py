@@ -27,9 +27,39 @@ features       = _load("features.pkl")
 city_encoder   = _load("city_encoder.pkl")
 cluster_config = _load("cluster_config.pkl")
 
-CLUSTER_NAMES = cluster_config["names"]   if cluster_config else {}
-CLUSTER_RECS  = cluster_config["recs"]    if cluster_config else {}
-CLUSTER_ICONS = cluster_config.get("icons", {0:"❄️", 1:"🌿", 2:"👨‍👩‍👧‍👦"})
+DEFAULT_CLUSTER_NAMES = {
+    0: "High Occupancy Household",
+    1: "Heavy AC User",
+    2: "Energy Efficient Household",
+}
+
+DEFAULT_CLUSTER_ICONS = {
+    0: "👨‍👩‍👧‍👦",
+    1: "❄️",
+    2: "🌿",
+}
+
+DEFAULT_CLUSTER_RECS = {
+    0: [
+        "With more occupants, standby power from multiple devices adds up - unplug chargers when not in use.",
+        "A rooftop solar installation would give your household strong financial returns given your high consumption level.",
+        "Coordinate heavy appliance use - avoid running the washing machine and water heater at the same time.",
+    ],
+    1: [
+        "Your AC is your biggest emission source - setting it to 26°C instead of 22°C cuts AC emissions by up to 30%.",
+        "Use a sleep timer so your AC turns off automatically 30 minutes after you sleep.",
+        "Consider upgrading to an inverter AC - it uses 40% less electricity than a non-inverter model.",
+    ],
+    2: [
+        "Your household is already energy-efficient. Focus on replacing any remaining old bulbs with LED.",
+        "Check your refrigerator door seals - worn seals waste up to 15% more electricity continuously.",
+        "Shift your washing machine to off-peak hours (before 6 PM or after 10 PM) to benefit from lower CEB tariff rates.",
+    ],
+}
+
+CLUSTER_NAMES = DEFAULT_CLUSTER_NAMES
+CLUSTER_ICONS = DEFAULT_CLUSTER_ICONS
+CLUSTER_RECS  = DEFAULT_CLUSTER_RECS
 
 MODEL_STATUS = {
     "xgboost":      xgb_model      is not None,

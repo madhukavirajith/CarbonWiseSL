@@ -38,13 +38,13 @@ def explain_prediction(data: ApplianceInput):
 
     results.sort(key=lambda x: abs(x.shap_value), reverse=True)
 
-    # Filter out non-appliance inputs for the "Biggest Culprit" card
-    exclude_culprits = {"occupants", "city_encoded"}
-    appliance_results = [r for r in results if r.feature not in exclude_culprits]
+    # Filter out non-appliance inputs (occupants, city_encoded) for appliance breakdown
+    exclude_non_appliances = {"occupants", "city_encoded"}
+    appliance_results = [r for r in results if r.feature not in exclude_non_appliances]
     top_culprit = appliance_results[0].label if appliance_results else "Unknown"
 
     return ExplainOutput(
-        shap_values   = results[:12],   # top 12 for display
+        shap_values   = appliance_results[:12],   # top 12 appliance features for display
         base_value    = round(base_value, 4),
         predicted_co2 = round(predicted, 3),
         top_culprit   = top_culprit,

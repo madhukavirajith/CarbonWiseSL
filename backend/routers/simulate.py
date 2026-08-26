@@ -49,16 +49,27 @@ def simulate(data: SimulationInput):
     X_orig = np.array([ml.input_to_features(base)])
     X_mod  = np.array([ml.input_to_features(modified)])
 
-    orig_co2 = float(ml.xgb_model.predict(X_orig)[0])
-    new_co2  = float(ml.xgb_model.predict(X_mod)[0])
+    raw_orig_co2 = float(ml.xgb_model.predict(X_orig)[0])
+    raw_new_co2  = float(ml.xgb_model.predict(X_mod)[0])
 
-    saving_day   = orig_co2 - new_co2
-    saving_month = saving_day * 30
-    kwh_saving   = saving_day / ml.SL_EMISSION_FACTOR
-    orig_cost    = ml.get_ceb_cost(base.ceb_units)
-    new_cost     = ml.get_ceb_cost(max(0.0, base.ceb_units - kwh_saving * 30))
-    cost_saving  = orig_cost - new_cost
-    saving_pct   = round(saving_day / (orig_co2 + 1e-9) * 100, 1)
+    orig_co2 = max(0.1, raw_orig_co2)
+    new_co2  = max(0.1, raw_new_co2)
+
+    # If appliance is absent (e.g. AC simulation on a home with no AC), savings must be 0
+    if sc in ["ac_temp", "ac_hours"] and (base.has_ac == 0 or base.ac_hours == 0 or base.ac_rooms == 0):
+        saving_day   = 0.0
+        saving_month = 0.0
+        cost_saving  = 0.0
+        saving_pct   = 0.0
+        new_co2      = orig_co2
+    else:
+        saving_day   = max(0.0, orig_co2 - new_co2)
+        saving_month = saving_day * 30
+        kwh_saving   = saving_day / ml.SL_EMISSION_FACTOR
+        orig_cost    = ml.get_ceb_cost(base.ceb_units)
+        new_cost     = ml.get_ceb_cost(max(0.0, base.ceb_units - kwh_saving * 30))
+        cost_saving  = max(0.0, orig_cost - new_cost)
+        saving_pct   = round((saving_day / orig_co2) * 100, 1)
 
     if saving_pct > 20:
         impact = "High Impact"
