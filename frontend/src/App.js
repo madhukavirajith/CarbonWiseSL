@@ -8,12 +8,30 @@ import HistoryPage from './pages/HistoryPage';
 import AuthPage from './pages/AuthPage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import { translations } from './translations/translations';
 
 export const AppContext = React.createContext(null);
 
 function App() {
     const [formData, setFormData] = useState(null);
     const [results, setResults] = useState(null);
+    
+    // Language state (en / si)
+    const [lang, setLang] = useState(() => {
+        return localStorage.getItem('cw_lang') || 'en';
+    });
+
+    useEffect(() => {
+        localStorage.setItem('cw_lang', lang);
+        document.documentElement.lang = lang;
+        document.documentElement.setAttribute('data-lang', lang);
+    }, [lang]);
+
+    const toggleLang = () => {
+        setLang(prev => (prev === 'en' ? 'si' : 'en'));
+    };
+
+    const t = translations[lang] || translations.en;
     
     // User authentication state
     const [user, setUser] = useState(() => {
@@ -52,7 +70,7 @@ function App() {
     };
 
     return (
-        <AppContext.Provider value={{ formData, setFormData, results, setResults, userId, user, login, logout, resetAll }}>
+        <AppContext.Provider value={{ formData, setFormData, results, setResults, userId, user, login, logout, resetAll, lang, setLang, toggleLang, t }}>
             <BrowserRouter>
                 <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
                     <Navbar />

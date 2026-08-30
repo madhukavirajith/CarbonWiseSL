@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import numpy as np
 
+# [ML Concept: Data Preprocessing - Domain Constant]
+# SLSEA 2024 grid emission factor: used to convert electricity energy (kWh) to carbon emissions (kg CO2)
 SL_EMISSION_FACTOR = 0.52   # kg CO2 per kWh - SLSEA 2024
 
 
@@ -12,9 +14,9 @@ else:
 
 
 def load_survey_data(filepath=None):
-   
+    # [ML Concept: Data Acquisition / Data Ingestion]
+    # Reads raw survey data from local CSV or cloud fallback into a Pandas DataFrame
     if filepath is None:
-        
         local_path = os.path.join(DATA_DIR, 'SL_Appliance_Survey_1.csv')
         if not os.path.exists(local_path):
             local_path = os.path.join(DATA_DIR, 'SL_Appliance_Survey_Synthetic_200.csv')
@@ -26,6 +28,8 @@ def load_survey_data(filepath=None):
 
     df = pd.read_csv(filepath)
 
+    # [ML Concept: Data Preprocessing - Column Standardization / Schema Mapping]
+    # Renames survey question titles into consistent, standard variable names for the ML pipeline
     rename_map = {
         'Timestamp':                        'timestamp',
         'Respondent_ID':                    'respondent_id',
@@ -71,9 +75,11 @@ def load_survey_data(filepath=None):
         'Monthly_CO2_Emissions_kg':         'monthly_co2_kg',
         'Emission_Level':                   'emission_level',
     }
-    # Only rename columns that actually exist
+    # Only rename columns that actually exist in the file
     df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
 
+    # [ML Concept: Data Preprocessing - Binary Encoding (Text to Numbers)]
+    # Machine learning models only understand numbers; converts "Yes"/"No" strings into 1 and 0
     yes_no_cols = [
         'has_ac', 'has_fridge', 'has_heater', 'has_washer',
         'has_computer', 'has_rice_cooker', 'has_microwave',
@@ -85,6 +91,8 @@ def load_survey_data(filepath=None):
                 df[col].astype(str).str.strip().str.lower() == 'yes'
             ).astype(int)
 
+    # [ML Concept: Data Preprocessing - Missing Value Imputation]
+    # Fills missing numerical values (NaN) with 0 so the model does not crash
     numeric_cols = df.select_dtypes(include=[np.number]).columns
     df[numeric_cols] = df[numeric_cols].fillna(0)
 

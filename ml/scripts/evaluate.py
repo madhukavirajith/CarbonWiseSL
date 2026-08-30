@@ -22,6 +22,8 @@ from feature_engineering import engineer_features, FEATURE_COLUMNS
 
 MODELS_DIR = os.path.join(base_dir, '..', 'models') if '__file__' in globals() else os.path.join(base_dir, 'models')
 
+# [ML Concept: Model Artifact Verification]
+# List of all pre-trained model files and encoders required to run the full application
 REQUIRED_FILES = [
     'xgboost_model.pkl',
     'kmeans_model.pkl',
@@ -34,6 +36,8 @@ REQUIRED_FILES = [
 
 
 def load_all():
+    # [ML Concept: Model Deserialization]
+    # Loads all saved binary models into memory
     print("\n" + "=" * 60)
     print("Loading all model files...")
     print("=" * 60)
@@ -64,8 +68,11 @@ def load_all():
 
 def test_full_pipeline(models):
     """
-    Simulates exactly what the FastAPI backend does
-    for a POST /api/predict → /api/explain → /api/cluster request.
+    [ML Concept: End-to-End Inference Testing]
+    Simulates the exact 3-step sequence executed by the FastAPI server when a user submits their data:
+    1. XGBoost Regression Prediction
+    2. SHAP Explainability Decomposition
+    3. K-Means Household Clustering
     """
     print("\n" + "=" * 60)
     print("END-TO-END PIPELINE TEST")
@@ -79,9 +86,13 @@ def test_full_pipeline(models):
     city_encoder = models['city_encoder.pkl']
     config       = models['cluster_config.pkl']
 
+    # [ML Concept: Categorical Transformation & Data Leakage Prevention]
+    # Uses .transform() with pre-fitted city encoder; does NOT re-fit on new input
     city       = 'Colombo'
     city_enc   = int(city_encoder.transform([city])[0])
 
+    # [ML Concept: Feature Vector Construction]
+    # Creates an individual 33-dimensional feature row representing a single household
     feature_values = {
         'occupants':       4,
         'ceb_units':       280.0,
@@ -119,13 +130,15 @@ def test_full_pipeline(models):
         'city_encoded':    city_enc,
     }
 
-    # Build feature vector in the exact column order
+    # [ML Concept: Feature Alignment]
+    # Assembles the numpy vector in the exact column order expected by the models
     X = np.array([[feature_values[f] for f in features]])
 
     print(f"\nTest household: {city}, 4 occupants, AC {feature_values['ac_hours']} hrs/day")
     print(f"CEB units: {feature_values['ceb_units']}  |  Feature vector length: {len(X[0])}")
 
     # ── 1. XGBoost prediction ─────────────────────────────────────────────
+    # [ML Concept: Supervised Model Inference]
     print("\n--- Module 1: XGBoost Prediction ---")
     daily_co2   = float(xgb_model.predict(X)[0])
     monthly_co2 = daily_co2 * 30
@@ -141,6 +154,7 @@ def test_full_pipeline(models):
     print(f"  Level       : {level}")
 
     # ── 2. SHAP explanation ───────────────────────────────────────────────
+    # [ML Concept: Explainable AI - Local Feature Attribution]
     print("\n--- Module 2: SHAP Explanation ---")
     shap_vals  = explainer.shap_values(X)[0]
     base_value = explainer.expected_value
@@ -150,6 +164,7 @@ def test_full_pipeline(models):
         base_value = float(base_value)
     total_abs  = np.abs(shap_vals).sum() + 1e-9
 
+    # Ranks appliances by which ones pushed emissions up or down the most
     ranked = sorted(
         zip(features, shap_vals),
         key=lambda x: abs(x[1]), reverse=True
@@ -165,6 +180,7 @@ def test_full_pipeline(models):
     print(f"  Top culprit: {top_culprit}")
 
     # ── 3. K-Means clustering ─────────────────────────────────────────────
+    # [ML Concept: Feature Scaling at Inference & Cluster Assignment]
     print("\n--- Module 3: K-Means Cluster ---")
     daily_kwh_est = daily_co2 / SL_EF
     cluster_vec = np.array([[
@@ -176,6 +192,7 @@ def test_full_pipeline(models):
         feature_values['washer_loads'], feature_values['occupants'],
         feature_values['has_solar'],
     ]])
+    # Uses pre-fitted scaler (.transform, NOT .fit_transform) to prevent data leakage
     cluster_scaled = scaler.transform(cluster_vec)
     cluster_id     = int(kmeans.predict(cluster_scaled)[0])
     cluster_name   = config['names'].get(cluster_id, f'Cluster {cluster_id}')
@@ -200,8 +217,8 @@ def test_full_pipeline(models):
 
 def test_model_consistency(models):
     """
-    Verify the feature list saved in features.pkl matches
-    FEATURE_COLUMNS in feature_engineering.py.
+    [ML Concept: Schema & Feature Contract Consistency Check]
+    Ensures that the features stored in features.pkl match FEATURE_COLUMNS in the code exactly.
     """
     print("\n" + "=" * 60)
     print("Feature Consistency Check")

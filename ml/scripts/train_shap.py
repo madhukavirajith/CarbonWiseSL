@@ -62,16 +62,19 @@ def build_shap_explainer():
     city_encoder = _load('city_encoder.pkl')
     print(f"Model type : {type(xgb_model).__name__}")
 
-    # ── Load data ─────────────────────────────────────────────────────────
+    # [ML Concept: Data Leakage Prevention during Evaluation]
+    # Uses pre-fitted city_encoder (fit_encoder=False) to maintain consistent feature encoding
     print("\nStep 2 - Loading survey data...")
     df = load_survey_data()
     X, y, _ = engineer_features(df, fit_encoder=False, city_encoder=city_encoder)
     print(f"Data shape : {X.shape}")
 
-    # ── Build TreeExplainer ───────────────────────────────────────────────
+    # [ML Concept: Explainable AI (XAI) & Cooperative Game Theory]
+    # [ML Concept: TreeSHAP Algorithm]
+    # Computes exact Shapley values by traversing decision tree paths in polynomial time
     print("\nStep 3 - Building SHAP TreeExplainer...")
-    # TreeExplainer is exact (not approximate) for XGBoost tree ensembles
     explainer = shap.TreeExplainer(xgb_model)
+    # Base Value: the average expected CO2 output across the baseline population (phi_0)
     expected_val = explainer.expected_value
     if isinstance(expected_val, (np.ndarray, list)):
         expected_val = float(expected_val[0])
@@ -79,12 +82,14 @@ def build_shap_explainer():
         expected_val = float(expected_val)
     print(f"Base value (expected prediction): {expected_val:.4f} kg CO2/day")
 
-    # ── Test on sample rows ───────────────────────────────────────────────
+    # [ML Concept: Additive Feature Attribution]
+    # Decomposes each household's prediction into: Prediction = Base_Value + sum(Shapley_Values)
     print("\nStep 4 - Testing SHAP on 10 sample rows...")
     shap_values = explainer.shap_values(X.iloc[:10])
     print(f"SHAP values shape : {shap_values.shape}")
 
-    # Mean absolute SHAP - shows which features matter most overall
+    # [ML Concept: Global Feature Attribution Ranking]
+    # Measures the average absolute impact (|SHAP|) of each appliance across all households
     mean_abs = np.abs(shap_values).mean(axis=0)
     ranked = sorted(
         zip(FEATURE_COLUMNS, mean_abs),
@@ -94,7 +99,8 @@ def build_shap_explainer():
     for feat, val in ranked[:10]:
         print(f"  {feat:<30} {val:.5f}")
 
-    # ── Generate summary plot ─────────────────────────────────────────────
+    # [ML Concept: Global Model Interpretability Visualization (Summary Plot)]
+    # Visualizes whether high or low values of an appliance increase or decrease carbon emissions
     print("\nStep 5 - Generating SHAP summary plot...")
     shap_all = explainer.shap_values(X)
 
@@ -111,7 +117,8 @@ def build_shap_explainer():
     plt.close()
     print(f"SHAP summary plot saved: {summary_path}")
 
-    # Waterfall for first sample
+    # [ML Concept: Local Instance-Level Explanation (Waterfall Plot)]
+    # Shows the exact step-by-step breakdown of how one specific household reached its prediction
     explanation = explainer(X.iloc[:1])
     plt.figure(figsize=(10, 6))
     shap.plots.waterfall(explanation[0], show=False)
@@ -122,7 +129,8 @@ def build_shap_explainer():
     plt.close()
     print(f"SHAP waterfall sample saved: {waterfall_path}")
 
-    # ── Save explainer ────────────────────────────────────────────────────
+    # [ML Concept: Model Explainer Serialization]
+    # Saves the explainer so the FastAPI backend can generate real-time waterfall charts for web users
     print("\nStep 6 - Saving SHAP explainer...")
     save_path = os.path.join(MODELS_DIR, 'shap_explainer.pkl')
     with open(save_path, 'wb') as f:

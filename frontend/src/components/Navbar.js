@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
-import { User, ArrowRight, Menu, X } from 'lucide-react';
+import { User, ArrowRight, Menu, X, Globe } from 'lucide-react';
 import { useSpring, animated } from '@react-spring/web';
 
 const S = {
@@ -59,6 +59,31 @@ const S = {
         cursor: 'pointer',
         transition: 'all 0.2s',
     },
+    langToggle: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        background: 'rgba(255, 255, 255, 0.07)',
+        border: '1px solid rgba(178, 221, 224, 0.22)',
+        borderRadius: 20,
+        padding: '3px',
+        cursor: 'pointer',
+        userSelect: 'none',
+        transition: 'all 0.2s ease',
+    },
+    langSegment: (active) => ({
+        padding: '4px 10px',
+        borderRadius: 16,
+        fontSize: 12,
+        fontWeight: 700,
+        letterSpacing: '0.3px',
+        color: active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.65)',
+        background: active ? 'linear-gradient(135deg, #0D7680, #0a5d65)' : 'transparent',
+        boxShadow: active ? '0 2px 8px rgba(13,118,128,0.45)' : 'none',
+        transition: 'all 0.25s ease',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+    }),
 };
 
 export default function Navbar() {
@@ -66,7 +91,7 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
-    const { user, logout } = useContext(AppContext);
+    const { user, logout, lang, toggleLang, t } = useContext(AppContext);
 
     useEffect(() => {
         const handler = () => setScrolled(window.scrollY > 20);
@@ -82,6 +107,15 @@ export default function Navbar() {
         transform: logoHovered ? 'scale(1.15) rotate(15deg)' : 'scale(1) rotate(0deg)',
         config: { mass: 1, tension: 350, friction: 12 }
     });
+
+    const navT = t?.nav || {
+        calculate: 'Calculate',
+        solar: 'Solar ROI',
+        history: 'History',
+        signIn: 'Sign In',
+        getStarted: 'Get Started',
+        logout: 'Logout',
+    };
 
     return (
         <nav style={S.nav(scrolled || !isLanding, isOpen)}>
@@ -112,9 +146,31 @@ export default function Navbar() {
                 </button>
 
                 <div className={`nav-menu ${isOpen ? 'is-open' : ''}`}>
-                    <Link to="/calculate" style={S.link(path === '/calculate')} onClick={() => setIsOpen(false)}>Calculate</Link>
-                    <Link to="/solar" style={S.link(path === '/solar')} onClick={() => setIsOpen(false)}>Solar ROI</Link>
-                    <Link to="/history" style={S.link(path === '/history')} onClick={() => setIsOpen(false)}>History</Link>
+                    <Link to="/calculate" style={S.link(path === '/calculate')} onClick={() => setIsOpen(false)}>
+                        {navT.calculate}
+                    </Link>
+                    <Link to="/solar" style={S.link(path === '/solar')} onClick={() => setIsOpen(false)}>
+                        {navT.solar}
+                    </Link>
+                    <Link to="/history" style={S.link(path === '/history')} onClick={() => setIsOpen(false)}>
+                        {navT.history}
+                    </Link>
+
+                    {/* Bilingual Language Switcher */}
+                    <div 
+                        style={S.langToggle} 
+                        onClick={toggleLang} 
+                        role="button"
+                        aria-label={`Switch language. Current: ${lang === 'en' ? 'English' : 'Sinhala'}`}
+                        title={lang === 'en' ? 'සිංහල භාෂාවට මාරු වන්න' : 'Switch to English'}
+                    >
+                        <span style={S.langSegment(lang === 'en')}>
+                            EN
+                        </span>
+                        <span style={S.langSegment(lang === 'si')}>
+                            සිං
+                        </span>
+                    </div>
 
                     {user ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 8 }} className="nav-user-section">
@@ -127,14 +183,16 @@ export default function Navbar() {
                                 onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(192, 57, 43, 0.2)'; e.currentTarget.style.borderColor = 'rgba(192, 57, 43, 0.4)'; e.currentTarget.style.color = '#FF8A80'; }}
                                 onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'; e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)'; e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)'; }}
                             >
-                                Logout
+                                {navT.logout}
                             </button>
                         </div>
                     ) : (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 8 }} className="nav-user-section">
-                            <Link to="/auth" style={S.link(path === '/auth')} onClick={() => setIsOpen(false)}>Sign In</Link>
+                            <Link to="/auth" style={S.link(path === '/auth')} onClick={() => setIsOpen(false)}>
+                                {navT.signIn}
+                            </Link>
                             <Link to="/calculate" style={S.cta} onClick={() => setIsOpen(false)}>
-                                Get Started <ArrowRight size={14} />
+                                {navT.getStarted} <ArrowRight size={14} />
                             </Link>
                         </div>
                     )}

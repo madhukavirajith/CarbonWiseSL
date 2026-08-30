@@ -41,16 +41,23 @@ def train(df):
     print("XGBoost Training - CarbonWise SL")
     print("=" * 60)
 
-    # Feature engineering
+    # [ML Concept: Feature Engineering]
+    # Extracts input feature matrix (X), continuous target vector (y), and encodes cities
     X, y, city_encoder = engineer_features(df, fit_encoder=True)
 
-    # Train / test split
+    # [ML Concept: Data Splitting (Train/Test Partitioning)]
+    # Splits dataset into 80% training data (to learn) and 20% testing data (unseen data for evaluation)
+    # random_state=42 guarantees reproducibility across runs
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.20, random_state=42
     )
     print(f"\nTrain: {len(X_train)} rows | Test: {len(X_test)} rows")
 
-    # Hyperparameter grid
+    # [ML Concept: Hyperparameter Tuning - Search Space Definition]
+    # [ML Concept: Regularization & Overfitting Control]
+    # max_depth: controls tree complexity/depth (prevents memorization of noise)
+    # learning_rate (eta): shrinks each tree's impact to ensure gradual, stable learning
+    # subsample / colsample_bytree: random sample/feature sub-sampling to prevent tree correlation
     param_grid = {
         'n_estimators':     [100, 200, 300],
         'max_depth':        [3, 5, 7],
@@ -59,6 +66,9 @@ def train(df):
         'colsample_bytree': [0.8, 1.0],
     }
 
+    # [ML Concept: Supervised Learning - Gradient Boosted Decision Trees (Ensemble Model)]
+    # [ML Concept: Loss Function Optimization]
+    # objective='reg:squarederror' minimizes Mean Squared Error (L2 Loss) using 2nd-order gradients
     base_model = xgb.XGBRegressor(
         objective='reg:squarederror',
         random_state=42,
@@ -67,6 +77,8 @@ def train(df):
     )
 
     print("\nRunning GridSearchCV (this takes 1-3 minutes)...")
+    # [ML Concept: Hyperparameter Tuning (Grid Search) with 5-Fold Cross-Validation]
+    # Systematically tests all parameter combinations and picks the model with the highest R2 score
     grid_search = GridSearchCV(
         estimator=base_model,
         param_grid=param_grid,
@@ -80,11 +92,15 @@ def train(df):
 
     print(f"\nBest params: {grid_search.best_params_}")
 
-    # Evaluation
+    # [ML Concept: Model Evaluation on Unseen Test Data]
     y_pred = best_model.predict(X_test)
+    # R2 Score: proportion of variance explained by model (1.0 = perfect score)
     r2   = r2_score(y_test, y_pred)
+    # MAE (Mean Absolute Error): average absolute magnitude of errors (L1 risk)
     mae  = mean_absolute_error(y_test, y_pred)
+    # RMSE (Root Mean Squared Error): penalizes larger prediction deviations (L2 risk)
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    # MAPE: Mean Absolute Percentage Error (relative error scale)
     mape = np.mean(np.abs((y_test - y_pred) / (y_test + 1e-9))) * 100
 
     print("\n--- Test Set Metrics ---")
@@ -98,12 +114,14 @@ def train(df):
     else:
         print("\n[FAIL] R2 below target - collect more survey responses and retrain")
 
-    # 5-fold CV on full dataset
+    # [ML Concept: 5-Fold Cross-Validation (Generalization & Variance Assessment)]
+    # Confirms the model performs reliably across 5 different subsets of the data
     cv_scores = cross_val_score(best_model, X, y, cv=5, scoring='r2')
     print(f"\n5-Fold CV R2: {[round(s,4) for s in cv_scores]}")
     print(f"Mean CV R2  : {cv_scores.mean():.4f} +/- {cv_scores.std():.4f}")
 
-    # Feature importance chart
+    # [ML Concept: Global Feature Importance Analysis]
+    # Computes how much each feature contributed to improving tree splits across the ensemble
     importances = pd.Series(
         best_model.feature_importances_, index=FEATURE_COLUMNS
     ).sort_values(ascending=True).tail(15)
@@ -118,7 +136,8 @@ def train(df):
     plt.close()
     print(f"\nFeature importance chart saved: {chart_path}")
 
-    # Actual vs predicted scatter
+    # [ML Concept: Residual / Goodness-of-Fit Visual Validation]
+    # Scatter plot comparing actual values vs predicted values against the ideal diagonal line
     plt.figure(figsize=(6, 6))
     plt.scatter(y_test, y_pred, alpha=0.6, color='#0D7680', s=40)
     lim = [min(y_test.min(), y_pred.min()) * 0.95,
@@ -142,6 +161,8 @@ def train(df):
 
 
 def save_models(model, city_encoder):
+    # [ML Concept: Model Serialization & Persistence]
+    # Saves trained model binaries (.pkl) so the backend can load and serve predictions instantly
     files = {
         'xgboost_model.pkl': model,
         'city_encoder.pkl':  city_encoder,

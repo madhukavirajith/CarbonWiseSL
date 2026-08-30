@@ -26,6 +26,7 @@
 ## 📖 Table of Contents
 
 - [Overview](#-overview)
+- [User Manual & Thesis Appendix](USER_MANUAL.md)
 - [System Architecture](#-system-architecture)
 - [Key Features](#-key-features)
 - [Tech Stack](#-tech-stack)

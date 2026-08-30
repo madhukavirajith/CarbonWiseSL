@@ -33,15 +33,16 @@ from data_loader import load_survey_data
 MODELS_DIR = os.path.join(base_dir, '..', 'models') if '__file__' in globals() else os.path.join(base_dir, 'models')
 os.makedirs(MODELS_DIR, exist_ok=True)
 
-# ── Features used for clustering ──────────────────────────────────────────
+# [ML Concept: Feature Selection for Clustering]
+# Identifies behavioral energy attributes used to calculate geometric distances between households
 CLUSTER_FEATURES = [
     'daily_kwh_raw', 'has_ac', 'ac_hours', 'ac_rooms',
     'has_heater', 'heater_hours', 'num_fans', 'fan_hours',
     'has_washer', 'washer_loads', 'occupants', 'has_solar',
 ]
 
-# ── Cluster names and recommendations ─────────────────────────────────────
-# Update these after reading the cluster_summary printout below
+# [ML Concept: Cluster Profiling & Archetype Labeling]
+# Translates mathematical cluster IDs (0, 1, 2) into human-interpretable behavioral personas
 CLUSTER_NAMES = {
     0: 'High Occupancy Household',
     1: 'Heavy AC User',
@@ -54,6 +55,7 @@ CLUSTER_ICONS = {
     2: '🌿',
 }
 
+# [ML Concept: Prescriptive Post-Clustering Recommendations]
 CLUSTER_RECOMMENDATIONS = {
     0: [
         'With more occupants, standby power from multiple devices adds up - unplug chargers when not in use.',
@@ -74,17 +76,25 @@ CLUSTER_RECOMMENDATIONS = {
 
 
 def find_best_k(X_scaled, k_range=range(2, 9)):
-    """Elbow method + silhouette analysis to find optimal K."""
+    """
+    [ML Concept: Hyperparameter Optimization for K-Means - Finding Optimal K]
+    Combines the Elbow Method (Inertia/WCSS) and Silhouette Analysis to choose the ideal cluster count.
+    """
     inertias    = []
     silhouettes = []
 
     for k in k_range:
+        # [ML Concept: Lloyd's K-Means Algorithm]
+        # Fits K clusters and measures distance minimization
         km = KMeans(n_clusters=k, random_state=42, n_init=10)
         km.fit(X_scaled)
+        # Inertia: Within-Cluster Sum of Squares (WCSS) - smaller is tighter
         inertias.append(km.inertia_)
+        # Silhouette Score: evaluates cluster separation vs compactness (-1 to +1)
         silhouettes.append(silhouette_score(X_scaled, km.labels_))
 
-    # Plot
+    # [ML Concept: Cluster Validation Visualization]
+    # Plots the Elbow Curve and Silhouette Scores for each K candidate
     fig, axes = plt.subplots(1, 2, figsize=(12, 4))
     axes[0].plot(list(k_range), inertias, 'bo-', lw=2, ms=7)
     axes[0].set_xlabel('K'); axes[0].set_ylabel('Inertia')
@@ -99,6 +109,7 @@ def find_best_k(X_scaled, k_range=range(2, 9)):
     plt.savefig(path, dpi=150); plt.close()
     print(f"Elbow chart saved: {path}")
 
+    # Picks the K that achieved the highest Silhouette Score
     best_k = list(k_range)[silhouettes.index(max(silhouettes))]
     print(f"\nSilhouette scores: {[round(s, 3) for s in silhouettes]}")
     print(f"Best K (highest silhouette): {best_k}")
@@ -121,7 +132,9 @@ def train(df, best_k=None):
     X = df[CLUSTER_FEATURES].fillna(0).values
     print(f"\nCluster feature matrix: {X.shape}")
 
-    # Scale
+    # [ML Concept: Feature Scaling - Z-Score Standardization (StandardScaler)]
+    # Crucial for distance-based clustering: transforms features to mean=0, std=1
+    # Prevents high-magnitude values (like kWh) from unfairly dominating low values (like binary flags)
     scaler   = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     print("StandardScaler applied.")
@@ -131,17 +144,21 @@ def train(df, best_k=None):
         best_k = find_best_k(X_scaled)
     print(f"\nUsing K = {best_k}")
 
-    # Train final model
+    # [ML Concept: Unsupervised Learning - K-Means Clustering Model]
+    # Groups similar households together in Euclidean space without needing labeled targets
     kmeans = KMeans(n_clusters=best_k, random_state=42, n_init=10)
     kmeans.fit(X_scaled)
 
+    # [ML Concept: Cluster Quality Metric - Silhouette Coefficient]
+    # Checks that distinct clusters are well separated (target > 0.30)
     final_sil = silhouette_score(X_scaled, kmeans.labels_)
     print(f"Final silhouette score: {final_sil:.4f}  (target > 0.30)")
 
     df = df.copy()
     df['cluster'] = kmeans.labels_
 
-    # Cluster summary - read this to verify/rename cluster labels
+    # [ML Concept: Cluster Centroid Analysis / Population Aggregation]
+    # Computes mean behavior of each cluster to understand its real-world meaning
     summary_cols = [c for c in ['daily_kwh_raw', 'has_ac', 'ac_hours',
                                  'heater_hours', 'occupants',
                                  'ceb_units', 'daily_co2_kg'] if c in df.columns]
@@ -154,7 +171,8 @@ def train(df, best_k=None):
         print(f"  Cluster {k}: {v}")
     print("\nUpdate CLUSTER_NAMES in this file if needed, then rerun.")
 
-    # Scatter visualisation
+    # [ML Concept: 2D Cluster Projection Visualization]
+    # Plots the clusters in 2D space (Daily kWh vs Daily CO2) for visual validation
     if 'daily_kwh_raw' in df.columns and 'daily_co2_kg' in df.columns:
         plt.figure(figsize=(8, 5))
         colors = ['#0D7680', '#1A7A4A', '#7B3F9E', '#C8932A', '#C0392B']
@@ -178,6 +196,8 @@ def train(df, best_k=None):
 
 
 def save_models(kmeans, scaler):
+    # [ML Concept: Model & Scaler Serialization]
+    # Saves the clusterer, scaler parameters, and recommendation mappings to .pkl files
     cluster_config = {
         'names':    CLUSTER_NAMES,
         'icons':    CLUSTER_ICONS,

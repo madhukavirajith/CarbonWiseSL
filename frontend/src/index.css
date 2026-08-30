@@ -35,6 +35,7 @@
 
   --font-body: 'Inter', system-ui, sans-serif;
   --font-head: 'Poppins', 'Inter', system-ui, sans-serif;
+  --font-sinhala: 'Noto Sans Sinhala', 'Inter', system-ui, sans-serif;
 
   --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -58,6 +59,27 @@ body {
   background: var(--grey1);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Sinhala Typography Optimization */
+html[lang="si"],
+[data-lang="si"],
+.lang-si {
+  font-family: var(--font-sinhala);
+}
+
+html[lang="si"] h1,
+html[lang="si"] h2,
+html[lang="si"] h3,
+html[lang="si"] h4,
+html[lang="si"] h5,
+html[lang="si"] h6 {
+  font-family: var(--font-sinhala);
+  line-height: 1.35;
+}
+
+html[lang="si"] p {
+  line-height: 1.8;
 }
 
 a {

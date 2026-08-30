@@ -1,5 +1,5 @@
 // frontend/src/pages/LandingPage.js
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import {
     BarChart3,
@@ -15,12 +15,10 @@ import {
     ClipboardList,
     User,
     Leaf,
-    Landmark,
-    Battery,
-    Award,
     Zap
 } from 'lucide-react';
 import { useSpring, useTrail, animated, config } from '@react-spring/web';
+import { AppContext } from '../App';
 
 /* ── custom hooks ─────────────────────────────────────────────── */
 function useInView(options = {}) {
@@ -126,7 +124,7 @@ const StatCard = ({ value, label, icon: Icon }) => {
                     </animated.span>
                 ) : value}
             </div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', marginTop: 6 }}>{label}</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', marginTop: 6, lineHeight: 1.4 }}>{label}</div>
         </animated.div>
     );
 };
@@ -154,6 +152,9 @@ const FeatureCard = ({ icon: Icon, title, desc, color }) => {
                     background: '#fff', borderRadius: 20, padding: '32px 28px',
                     borderTop: `4px solid ${color}`,
                     cursor: 'pointer',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
                 }}
                 onMouseEnter={() => setHover.start({ transform: 'translateY(-6px) scale(1.02)', boxShadow: '0 12px 32px rgba(0,0,0,0.12)' })}
                 onMouseLeave={() => setHover.start({ transform: 'translateY(0px) scale(1)', boxShadow: '0 4px 20px rgba(0,0,0,0.07)' })}
@@ -169,7 +170,7 @@ const FeatureCard = ({ icon: Icon, title, desc, color }) => {
                     fontSize: 18, fontWeight: 700, color: '#1B2A4A', marginBottom: 10,
                     fontFamily: "'Poppins',sans-serif"
                 }}>{title}</h3>
-                <p style={{ fontSize: 14, color: '#5A6A7A', lineHeight: 1.7 }}>{desc}</p>
+                <p style={{ fontSize: 14, color: '#5A6A7A', lineHeight: 1.7, flex: 1 }}>{desc}</p>
             </animated.div>
         </animated.div>
     );
@@ -223,9 +224,15 @@ const TestimonialCard = ({ quote, name, area, icon: Icon }) => {
             background: '#fff', borderRadius: 16, padding: '28px 24px',
             boxShadow: '0 4px 16px rgba(0,0,0,0.07)',
             border: '1px solid #E8ECF0',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
         }}>
-            <div style={{ fontSize: 32, color: '#0D7680', marginBottom: 12, lineHeight: 1 }}>"</div>
-            <p style={{ fontSize: 14, color: '#5A6A7A', lineHeight: 1.8, marginBottom: 20 }}>{quote}</p>
+            <div>
+                <div style={{ fontSize: 32, color: '#0D7680', marginBottom: 12, lineHeight: 1 }}>"</div>
+                <p style={{ fontSize: 14, color: '#5A6A7A', lineHeight: 1.8, marginBottom: 20 }}>{quote}</p>
+            </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{
                     width: 42, height: 42, borderRadius: '50%',
@@ -245,8 +252,16 @@ const TestimonialCard = ({ quote, name, area, icon: Icon }) => {
 
 /* ── MAIN PAGE ──────────────────────────────────────────────────── */
 export default function LandingPage() {
+    const { lang, t } = useContext(AppContext);
     const heroRef = useRef(null);
     const [particles, setParticles] = useState([]);
+
+    const heroT = t?.hero || {};
+    const statsT = t?.stats || {};
+    const featuresT = t?.features || {};
+    const howT = t?.howItWorks || {};
+    const testT = t?.testimonials || {};
+    const ctaT = t?.cta || {};
 
     const trail = useTrail(5, {
         from: { opacity: 0, transform: 'translateY(25px)' },
@@ -297,8 +312,20 @@ export default function LandingPage() {
         return () => window.removeEventListener('scroll', handler);
     }, []);
 
+    const featureIcons = [
+        { icon: Cpu, color: "#0D7680" },
+        { icon: Search, color: "#C8932A" },
+        { icon: Users, color: "#7B3F9E" },
+        { icon: Sliders, color: "#1A7A4A" },
+        { icon: Sun, color: "#E67E22" },
+        { icon: TrendingUp, color: "#C0392B" }
+    ];
+
+    const stepIcons = [ClipboardList, Cpu, Search, Lightbulb];
+    const testimonialIcons = [User, User, Users];
+
     return (
-        <div style={{ overflowX: 'hidden' }}>
+        <div style={{ overflowX: 'hidden' }} className={lang === 'si' ? 'lang-si' : ''}>
 
             {/* ════════ HERO ════════ */}
             <section style={{
@@ -353,37 +380,35 @@ export default function LandingPage() {
 
                                 <animated.div style={trail[1]}>
                                     <h1 style={{
-                                        fontFamily: "'Poppins',sans-serif",
-                                        fontSize: 'clamp(36px,4.5vw,58px)',
-                                        fontWeight: 800, lineHeight: 1.15,
+                                        fontFamily: lang === 'si' ? 'var(--font-sinhala)' : "'Poppins',sans-serif",
+                                        fontSize: 'clamp(32px,4.2vw,56px)',
+                                        fontWeight: 800, lineHeight: lang === 'si' ? 1.3 : 1.15,
                                         color: '#FFFFFF', marginBottom: 24,
-                                        letterSpacing: '-0.5px',
+                                        letterSpacing: lang === 'si' ? '0px' : '-0.5px',
                                     }}>
-                                        Know Your{' '}
+                                        {heroT.titlePrefix}{' '}
                                         <span style={{
                                             background: 'linear-gradient(90deg,#0D7680,#4ECDC4)',
                                             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                                         }}>
-                                            Carbon Footprint
+                                            {heroT.titleHighlight1}
                                         </span>
-                                        . Cut Your{' '}
+                                        {lang === 'si' ? ' ' : ''}{heroT.titleMiddle}{' '}
                                         <span style={{
                                             background: 'linear-gradient(90deg,#C8932A,#F5A623)',
                                             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                                         }}>
-                                            CEB Bill.
+                                            {heroT.titleHighlight2}
                                         </span>
                                     </h1>
                                 </animated.div>
 
                                 <animated.div style={trail[2]}>
                                     <p style={{
-                                        fontSize: 18, color: 'rgba(255,255,255,0.72)',
-                                        lineHeight: 1.75, marginBottom: 40, maxWidth: 500,
+                                        fontSize: 17, color: 'rgba(255,255,255,0.76)',
+                                        lineHeight: 1.75, marginBottom: 40, maxWidth: 520,
                                     }}>
-                                        Sri Lanka's first AI-powered electricity carbon tracker. Enter your appliances,
-                                        get your exact CO₂ footprint, see <em>which appliances</em> cause it, and
-                                        simulate how much you can save in rupees and kilograms.
+                                        {heroT.subtitle}
                                     </p>
                                 </animated.div>
 
@@ -392,10 +417,10 @@ export default function LandingPage() {
                                         display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 48,
                                     }}>
                                         <Btn to="/calculate" variant="primary">
-                                            <Zap size={16} /> Calculate My Footprint
+                                            <Zap size={16} /> {heroT.ctaCalculate || 'Calculate My Footprint'}
                                         </Btn>
                                         <Btn to="/solar" variant="secondary">
-                                            <Sun size={16} /> Solar ROI Calculator
+                                            <Sun size={16} /> {heroT.ctaSolar || 'Solar ROI Calculator'}
                                         </Btn>
                                     </div>
                                 </animated.div>
@@ -418,7 +443,7 @@ export default function LandingPage() {
                                     >
                                         <img
                                             src="/banner.png"
-                                            alt="CarbonWiseSL Dashboard Preview"
+                                            alt={heroT.imgAlt || "CarbonWiseSL Dashboard Preview"}
                                             style={{
                                                 width: '100%',
                                                 height: 'auto',
@@ -434,10 +459,10 @@ export default function LandingPage() {
 
                         {/* Stats row */}
                         <div className="responsive-stats-grid" style={{ marginTop: 72 }}>
-                            <StatCard value="0.52" label="kg CO₂ per kWh (SLSEA 2024)" icon={BarChart3} />
-                            <StatCard value="38%" label="of SL electricity is residential" icon={Home} />
-                            <StatCard value="Multi-Tier" label="CEB tariff modelled accurately" icon={Lightbulb} />
-                            <StatCard value="Free" label="No registration required" icon={CheckCircle2} />
+                            <StatCard value={statsT.stat1Value || "0.52"} label={statsT.stat1Label || "kg CO₂ per kWh (SLSEA 2024)"} icon={BarChart3} />
+                            <StatCard value={statsT.stat2Value || "38%"} label={statsT.stat2Label || "of SL electricity is residential"} icon={Home} />
+                            <StatCard value={statsT.stat3Value || "Multi-Tier"} label={statsT.stat3Label || "CEB tariff modelled accurately"} icon={Lightbulb} />
+                            <StatCard value={statsT.stat4Value || "Free"} label={statsT.stat4Label || "No registration required"} icon={CheckCircle2} />
                         </div>
                     </div>
                 </div>
@@ -458,42 +483,31 @@ export default function LandingPage() {
                             display: 'inline-block', padding: '6px 18px', borderRadius: 100,
                             background: '#E6F4F5', color: '#0D7680',
                             fontSize: 13, fontWeight: 600, marginBottom: 16,
-                        }}>What CarbonWiseSL Does</div>
+                        }}>{featuresT.badge || 'What CarbonWiseSL Does'}</div>
                         <h2 style={{
-                            fontFamily: "'Poppins',sans-serif", fontSize: 'clamp(28px,3.5vw,42px)',
+                            fontFamily: lang === 'si' ? 'var(--font-sinhala)' : "'Poppins',sans-serif",
+                            fontSize: 'clamp(26px,3.5vw,42px)',
                             fontWeight: 800, color: '#1B2A4A', marginBottom: 16,
-                        }}>Not Just a Calculator. An AI-Powered Advisor.</h2>
-                        <p style={{ fontSize: 17, color: '#5A6A7A', maxWidth: 580, margin: '0 auto' }}>
-                            Three AI models working together to predict, explain, and help you reduce
-                            your household electricity carbon footprint - calibrated specifically for Sri Lanka.
+                            lineHeight: 1.3,
+                        }}>{featuresT.title || 'Not Just a Calculator. An AI-Powered Advisor.'}</h2>
+                        <p style={{ fontSize: 16, color: '#5A6A7A', maxWidth: 620, margin: '0 auto', lineHeight: 1.7 }}>
+                            {featuresT.subtitle}
                         </p>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 24 }}>
-                        <FeatureCard
-                            icon={Cpu} color="#0D7680"
-                            title="AI Carbon Prediction"
-                            desc="Track your daily and monthly carbon footprint instantly. Built specifically for Sri Lankan homes, our smart tool looks at your electricity usage to predict your exact impact and matches it with current CEB electricity bills so you know exactly where you stand." />
-                        <FeatureCard
-                            icon={Search} color="#C8932A"
-                            title="Appliance Breakdown"
-                            desc="Ever wonder which appliance is harming the environment (and your wallet) the most? We pinpoint exactly how much your AC, refrigerator, or heater contributes to your footprint, giving you a clear list of your home’s biggest energy guzzlers." />
-                        <FeatureCard
-                            icon={Users} color="#7B3F9E"
-                            title="Personalised Profiles"
-                            desc="Every home is different. Our system automatically figures out your household type-whether you are a Heavy AC User, an Energy-Efficient home, or a High Occupancy family-and gives you custom, realistic tips tailored to your specific lifestyle." />
-                        <FeatureCard
-                            icon={Sliders} color="#1A7A4A"
-                            title="What-If Simulator"
-                            desc="Test out habits before you change them. See exactly how much money and CO₂ you’ll save in real-time by making simple tweaks, like setting your AC to 26°C, switching to LEDs, or reducing your weekly washing machine loads." />
-                        <FeatureCard
-                            icon={Sun} color="#E67E22"
-                            title="Solar ROI Calculator"
-                            desc="Thinking about going solar? Just enter your roof area and city to see how much your CEB bill will drop, how much clean energy you will generate, and exactly how many years it will take for the solar panels to pay for themselves." />
-                        <FeatureCard
-                            icon={TrendingUp} color="#C0392B"
-                            title="Emission History Tracker"
-                            desc="Watch your green journey unfold. By saving your history, you can look back at monthly trends to see how your small daily changes add up to massive, real-world reductions over time." />
+                        {featuresT.items?.map((item, idx) => {
+                            const config = featureIcons[idx] || { icon: Cpu, color: '#0D7680' };
+                            return (
+                                <FeatureCard
+                                    key={idx}
+                                    icon={config.icon}
+                                    color={config.color}
+                                    title={item.title}
+                                    desc={item.desc}
+                                />
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -507,21 +521,25 @@ export default function LandingPage() {
                                 display: 'inline-block', padding: '6px 18px', borderRadius: 100,
                                 background: '#E6F4F5', color: '#0D7680',
                                 fontSize: 13, fontWeight: 600, marginBottom: 20,
-                            }}>How It Works</div>
+                            }}>{howT.badge || 'How It Works'}</div>
                             <h2 style={{
-                                fontFamily: "'Poppins',sans-serif", fontSize: 'clamp(26px,3vw,38px)',
+                                fontFamily: lang === 'si' ? 'var(--font-sinhala)' : "'Poppins',sans-serif",
+                                fontSize: 'clamp(24px,3vw,38px)',
                                 fontWeight: 800, color: '#1B2A4A', marginBottom: 40,
-                            }}>From Your CEB Bill to Actionable Insights in 60 Seconds</h2>
+                                lineHeight: 1.3,
+                            }}>{howT.title || 'From Your CEB Bill to Actionable Insights in 60 Seconds'}</h2>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                                <StepBadge n="1" icon={ClipboardList} title="Enter Your Appliances"
-                                    desc="Tell us what you own - AC, fridge, fans, TV, washing machine, bulbs. Takes about 3 minutes for the first time." delay={false} />
-                                <StepBadge n="2" icon={Cpu} title="AI Predicts Your CO₂"
-                                    desc="Our system instantly calculates your daily and monthly carbon footprint based on your specific CEB electricity tariff, giving you an accurate picture of your impact." delay={false} />
-                                <StepBadge n="3" icon={Search} title="See Your Biggest Energy Guzzlers"
-                                    desc="No vague totals here. We break down the data to show you exactly how much carbon each individual appliance is responsible for, exposing the hidden culprits." delay={false} />
-                                <StepBadge n="4" icon={Lightbulb} title="Act on Personalised Recommendations" last
-                                    desc="Get recommendations matched to your household profile, simulate scenarios, and track your reduction progress week by week." delay={false} />
+                                {howT.steps?.map((step, idx) => (
+                                    <StepBadge
+                                        key={idx}
+                                        n={step.n || String(idx + 1)}
+                                        icon={stepIcons[idx] || ClipboardList}
+                                        title={step.title}
+                                        desc={step.desc}
+                                        last={idx === (howT.steps.length - 1)}
+                                    />
+                                ))}
                             </div>
                         </div>
 
@@ -558,23 +576,25 @@ export default function LandingPage() {
                 <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
                     <div style={{ textAlign: 'center', marginBottom: 56 }}>
                         <h2 style={{
-                            fontFamily: "'Poppins',sans-serif", fontSize: 'clamp(26px,3vw,36px)',
+                            fontFamily: lang === 'si' ? 'var(--font-sinhala)' : "'Poppins',sans-serif",
+                            fontSize: 'clamp(24px,3vw,36px)',
                             fontWeight: 800, color: '#1B2A4A', marginBottom: 12,
-                        }}>What Urban Households Say</h2>
+                            lineHeight: 1.3,
+                        }}>{testT.title || 'What Urban Households Say'}</h2>
                         <p style={{ fontSize: 15, color: '#5A6A7A' }}>
-                            Feedback from our User Acceptance Testing across Colombo, Kandy, and Galle
+                            {testT.subtitle}
                         </p>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 24 }}>
-                        <TestimonialCard
-                            icon={User} name="Ruwan S." area="Colombo 7"
-                            quote="I had no idea my AC was responsible for 60% of my electricity bill AND my carbon footprint. The SHAP chart made it immediately obvious. I shifted the temperature to 26°C and saved LKR 1,800 last month." />
-                        <TestimonialCard
-                            icon={User} name="Priya N." area="Kandy"
-                            quote="The solar calculator showed me my rooftop would pay back in 6.2 years. I've now applied for a solar loan. No other tool gave me this clearly with Sri Lankan data." />
-                        <TestimonialCard
-                            icon={Users} name="Fernando Family" area="Galle"
-                            quote="The what-if simulator let us experiment before making any changes. We replaced 4 old bulbs and reduced the washing machine loads - 0.7 kg CO₂ less per day, which we can see in the history chart." />
+                        {testT.items?.map((item, idx) => (
+                            <TestimonialCard
+                                key={idx}
+                                icon={testimonialIcons[idx] || User}
+                                name={item.name}
+                                area={item.area}
+                                quote={item.quote}
+                            />
+                        ))}
                     </div>
                 </div>
             </section>
@@ -590,20 +610,20 @@ export default function LandingPage() {
                         <Leaf size={48} />
                     </div>
                     <h2 style={{
-                        fontFamily: "'Poppins',sans-serif",
-                        fontSize: 'clamp(28px,3.5vw,44px)',
+                        fontFamily: lang === 'si' ? 'var(--font-sinhala)' : "'Poppins',sans-serif",
+                        fontSize: 'clamp(26px,3.5vw,44px)',
                         fontWeight: 800, color: '#fff', marginBottom: 16,
-                    }}>Ready to Know Your Carbon Footprint?</h2>
-                    <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.70)', marginBottom: 40, lineHeight: 1.7 }}>
-                        It takes 3 minutes. No registration. Free forever.
-                        Built with Sri Lankan data for Sri Lankan households.
+                        lineHeight: 1.3,
+                    }}>{ctaT.title || 'Ready to Know Your Carbon Footprint?'}</h2>
+                    <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.75)', marginBottom: 40, lineHeight: 1.7 }}>
+                        {ctaT.subtitle}
                     </p>
                     <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-                        <Btn to="/calculate" variant="gold"><Zap size={16} /> Calculate My Footprint</Btn>
-                        <Btn to="/solar" variant="secondary"><Sun size={16} /> Solar ROI Calculator</Btn>
+                        <Btn to="/calculate" variant="gold"><Zap size={16} /> {ctaT.btnCalculate || 'Calculate My Footprint'}</Btn>
+                        <Btn to="/solar" variant="secondary"><Sun size={16} /> {ctaT.btnSolar || 'Solar ROI Calculator'}</Btn>
                     </div>
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 28 }}>
-                        Data source: SLSEA Grid Emission Factor 2024 · CEB Domestic Tariff May 2026 · IPCC AR6
+                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', marginTop: 28 }}>
+                        {ctaT.dataSource}
                     </p>
                 </div>
             </section>
