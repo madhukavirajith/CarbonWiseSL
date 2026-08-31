@@ -1,5 +1,5 @@
 // frontend/src/components/WhatIfSimulator.js
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { simulate } from '../api';
 import { 
     Snowflake, 
@@ -115,8 +115,8 @@ function formatCostChange(value) {
 export default function WhatIfSimulator({ formData }) {
 
     // ── Bugs 10 / 11 / 12: seed slider defaults from the user's own formData ──
-    // Hooks must be called unconditionally (before any early return).
-    const initialValues = useMemo(() =>
+    // Lazy useState initializer runs once on mount — no dependency array needed.
+    const [values, setValues] = useState(() =>
         Object.fromEntries(scenarios.map(s => {
             const raw = s.formDataKey != null ? formData?.[s.formDataKey] : null;
             const num = raw != null ? Number(raw) : null;
@@ -125,15 +125,12 @@ export default function WhatIfSimulator({ formData }) {
                 return [s.id, num];
             }
             return [s.id, s.defaultVal];
-        })),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [] // compute once on mount
+        }))
     );
 
     const [results,    setResults]    = useState({});
     const [loading,    setLoading]    = useState({});
     const [runningAll, setRunningAll] = useState(false); // Bug 8
-    const [values,     setValues]     = useState(initialValues);
 
     // Bug 6: Guard against missing formData (placed after all hook calls)
     if (!formData) {
