@@ -1,5 +1,5 @@
 // frontend/src/components/WhatIfSimulator.js
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { simulate } from '../api';
 import { 
     Snowflake, 
@@ -14,18 +14,21 @@ import {
     CheckCircle2, 
     Droplets, 
     FileText, 
-    AlertTriangle 
+    AlertTriangle,
+    TrendingUp,
 } from 'lucide-react';
 
 const scenarios = [
     {
         id: 'ac_temp',
         icon: Snowflake,
-        title: 'Lower AC Temperature Setting',
+        // Bug 9 fix: was "Lower AC Temperature Setting" — contradicted the description
+        title: 'Raise AC Thermostat Setting',
         desc: 'What if you set AC to a higher (more efficient) temperature?',
         inputLabel: 'New temperature (°C)',
         min: 20, max: 30, step: 1, defaultVal: 26,
         unit: '°C',
+        formDataKey: 'ac_temp',   // Bug 10 fix: seed from user's actual data
     },
     {
         id: 'ac_hours',
@@ -35,15 +38,17 @@ const scenarios = [
         inputLabel: 'New daily runtime (hours)',
         min: 0, max: 16, step: 0.5, defaultVal: 4,
         unit: ' hrs/day',
+        formDataKey: 'ac_hours',  // Bug 11 fix: seed from user's actual data
     },
     {
         id: 'led_upgrade',
         icon: Lightbulb,
-        title: 'Replace All Bulbs with LED',
-        desc: 'What if you replaced every old and fluorescent bulb with 9W LEDs?',
-        inputLabel: 'Total bulbs to replace',
+        title: 'Replace Bulbs with LED',
+        desc: 'What if you replaced old and fluorescent bulbs with 9W LEDs?',
+        inputLabel: 'Bulbs to replace',
         min: 1, max: 30, step: 1, defaultVal: 4,
         unit: ' bulbs',
+        formDataKey: null,
     },
     {
         id: 'washer_shift',
@@ -53,6 +58,7 @@ const scenarios = [
         inputLabel: 'New loads per week',
         min: 0, max: 14, step: 1, defaultVal: 4,
         unit: ' loads/wk',
+        formDataKey: 'washer_loads', // Bug 12 fix: seed from user's actual data
     },
     {
         id: 'standby',
@@ -62,14 +68,16 @@ const scenarios = [
         inputLabel: 'Devices to switch off',
         min: 1, max: 10, step: 1, defaultVal: 3,
         unit: ' devices',
+        formDataKey: null,
     },
 ];
 
 function ImpactBadge({ label }) {
     const config = {
-        'High Impact': { bg: '#E8F5EE', color: '#1A7A4A', icon: Flame },
-        'Medium Impact': { bg: '#FDF6E3', color: '#C8932A', icon: CheckCircle2 },
-        'Low Impact': { bg: '#F4F6F8', color: '#8A9BB0', icon: Droplets },
+        'High Impact':         { bg: '#E8F5EE', color: '#1A7A4A', icon: Flame },
+        'Medium Impact':       { bg: '#FDF6E3', color: '#C8932A', icon: CheckCircle2 },
+        'Low Impact':          { bg: '#F4F6F8', color: '#8A9BB0', icon: Droplets },
+        'Increases Emissions': { bg: '#FDECEA', color: '#C0392B', icon: TrendingUp },
     };
     const c = config[label] || config['Low Impact'];
     const Icon = c.icon;
@@ -85,12 +93,66 @@ function ImpactBadge({ label }) {
     );
 }
 
+// Bug 1 fix: Helpers that correctly handle zero and negative savings
+function formatSaving(value, unit = ' kg') {
+    if (value > 0)  return `\u2212${value}${unit}`;   // − reduction (good)
+    if (value < 0)  return `+${Math.abs(value)}${unit}`; // + increase (bad)
+    return `0${unit}`;
+}
+
+function savingColor(value) {
+    if (value > 0)  return '#1A7A4A';  // green — reduction
+    if (value < 0)  return '#C0392B';  // red   — increase
+    return '#8A9BB0';                  // grey  — no change
+}
+
+function formatCostChange(value) {
+    if (value > 0)  return `LKR ${value.toLocaleString()} saved`;
+    if (value < 0)  return `LKR ${Math.abs(value).toLocaleString()} extra`;
+    return 'LKR 0';
+}
+
 export default function WhatIfSimulator({ formData }) {
-    const [results, setResults] = useState({});
-    const [loading, setLoading] = useState({});
-    const [values, setValues] = useState(
-        Object.fromEntries(scenarios.map(s => [s.id, s.defaultVal]))
+
+    // ── Bugs 10 / 11 / 12: seed slider defaults from the user's own formData ──
+    // Hooks must be called unconditionally (before any early return).
+    const initialValues = useMemo(() =>
+        Object.fromEntries(scenarios.map(s => {
+            const raw = s.formDataKey != null ? formData?.[s.formDataKey] : null;
+            const num = raw != null ? Number(raw) : null;
+            // Only use the formData value if it falls inside the slider's valid range
+            if (num != null && !isNaN(num) && num >= s.min && num <= s.max) {
+                return [s.id, num];
+            }
+            return [s.id, s.defaultVal];
+        })),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [] // compute once on mount
     );
+
+    const [results,    setResults]    = useState({});
+    const [loading,    setLoading]    = useState({});
+    const [runningAll, setRunningAll] = useState(false); // Bug 8
+    const [values,     setValues]     = useState(initialValues);
+
+    // Bug 6: Guard against missing formData (placed after all hook calls)
+    if (!formData) {
+        return (
+            <div style={{
+                textAlign: 'center', padding: '48px 24px',
+                background: '#FDF6E3', borderRadius: 14,
+                border: '1.5px solid #C8932A30',
+            }}>
+                <AlertTriangle size={32} style={{ color: '#C8932A', marginBottom: 12 }} />
+                <div style={{ fontSize: 14, color: '#5A6A7A', fontWeight: 600 }}>
+                    No appliance data found.
+                </div>
+                <div style={{ fontSize: 13, color: '#8A9BB0', marginTop: 4 }}>
+                    Please complete the calculator first to use the simulator.
+                </div>
+            </div>
+        );
+    }
 
     const runScenario = async (scenario) => {
         setLoading(prev => ({ ...prev, [scenario.id]: true }));
@@ -111,10 +173,25 @@ export default function WhatIfSimulator({ formData }) {
         }
     };
 
+    // Bug 5: run all scenarios in parallel instead of sequential await
+    // Bug 8: track runningAll to disable the button during execution
     const runAll = async () => {
-        for (const sc of scenarios) {
-            await runScenario(sc);
+        setRunningAll(true);
+        try {
+            await Promise.all(scenarios.map(sc => runScenario(sc)));
+        } finally {
+            setRunningAll(false);
         }
+    };
+
+    // Bug 7: clear stale result panel whenever the slider moves
+    const handleSliderChange = (id, rawValue) => {
+        setValues(prev => ({ ...prev, [id]: parseFloat(rawValue) }));
+        setResults(prev => {
+            const next = { ...prev };
+            delete next[id];
+            return next;
+        });
     };
 
     return (
@@ -128,23 +205,39 @@ export default function WhatIfSimulator({ formData }) {
                     Adjust any slider, then click <strong>Simulate</strong> to instantly see
                     how much CO₂ and money you would save with that change.
                 </div>
-                <button onClick={runAll} style={{
+
+                {/* Bug 8 fix: disabled + spinner while running all */}
+                <button onClick={runAll} disabled={runningAll} style={{
                     display: 'inline-flex', alignItems: 'center', gap: 6,
                     padding: '10px 22px', borderRadius: 10, fontSize: 13, fontWeight: 700,
-                    background: 'linear-gradient(135deg,#1B2A4A,#0D3B45)',
-                    color: '#fff', border: 'none', cursor: 'pointer',
-                    boxShadow: '0 3px 10px rgba(27,42,74,0.25)',
+                    background: runningAll
+                        ? '#E8ECF0'
+                        : 'linear-gradient(135deg,#1B2A4A,#0D3B45)',
+                    color: runningAll ? '#B0B8C4' : '#fff',
+                    border: 'none',
+                    cursor: runningAll ? 'not-allowed' : 'pointer',
+                    boxShadow: runningAll ? 'none' : '0 3px 10px rgba(27,42,74,0.25)',
+                    transition: 'all 0.2s',
                 }}>
-                    <Zap size={14} /> Simulate All
+                    {runningAll ? (
+                        <>
+                            <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />
+                            Running All…
+                        </>
+                    ) : (
+                        <>
+                            <Zap size={14} /> Simulate All
+                        </>
+                    )}
                 </button>
             </div>
 
             {/* Scenario cards */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {scenarios.map(sc => {
-                    const result = results[sc.id];
-                    const isLoading = loading[sc.id];
-                    const hasResult = result && !result.error;
+                    const result      = results[sc.id];
+                    const isLoading   = loading[sc.id];
+                    const hasResult   = result && !result.error;
                     const IconComponent = sc.icon;
 
                     return (
@@ -152,7 +245,9 @@ export default function WhatIfSimulator({ formData }) {
                             background: '#fff', borderRadius: 14,
                             border: '1.5px solid #E8ECF0',
                             overflow: 'hidden',
-                            boxShadow: hasResult ? '0 4px 16px rgba(13,118,128,0.08)' : '0 1px 4px rgba(0,0,0,0.04)',
+                            boxShadow: hasResult
+                                ? '0 4px 16px rgba(13,118,128,0.08)'
+                                : '0 1px 4px rgba(0,0,0,0.04)',
                             transition: 'box-shadow 0.3s',
                         }}>
                             <div style={{ padding: '20px 22px' }}>
@@ -165,7 +260,7 @@ export default function WhatIfSimulator({ formData }) {
                                         <span style={{ 
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             width: 40, height: 40, borderRadius: 10, 
-                                            background: '#E6F4F5', color: '#0D7680', flexShrink: 0 
+                                            background: '#E6F4F5', color: '#0D7680', flexShrink: 0,
                                         }}>
                                             <IconComponent size={20} />
                                         </span>
@@ -191,12 +286,12 @@ export default function WhatIfSimulator({ formData }) {
                                             {values[sc.id]}{sc.unit}
                                         </span>
                                     </div>
-                                    <input type="range"
+                                    <input
+                                        type="range"
                                         min={sc.min} max={sc.max} step={sc.step}
                                         value={values[sc.id]}
-                                        onChange={e => setValues(prev => ({
-                                            ...prev, [sc.id]: parseFloat(e.target.value),
-                                        }))}
+                                        // Bug 7 fix: clear stale result on slide
+                                        onChange={e => handleSliderChange(sc.id, e.target.value)}
                                         style={{ width: '100%', accentColor: '#0D7680', cursor: 'pointer' }}
                                     />
                                     <div style={{
@@ -209,7 +304,9 @@ export default function WhatIfSimulator({ formData }) {
                                 </div>
 
                                 {/* Simulate button */}
-                                <button onClick={() => runScenario(sc)} disabled={isLoading}
+                                <button
+                                    onClick={() => runScenario(sc)}
+                                    disabled={isLoading}
                                     style={{
                                         display: 'inline-flex', alignItems: 'center', gap: 6,
                                         padding: '9px 20px', borderRadius: 8, fontSize: 13, fontWeight: 600,
@@ -246,30 +343,27 @@ export default function WhatIfSimulator({ formData }) {
                                         gridTemplateColumns: 'repeat(auto-fit,minmax(140px,1fr))',
                                         gap: 12,
                                     }}>
+                                        {/* Bug 1 fix: correct sign and colour for zero and negative savings */}
                                         {[
                                             {
                                                 label: 'CO₂ Saving/Day',
-                                                value: result.co2_saving_kg_day > 0
-                                                    ? `-${result.co2_saving_kg_day} kg`
-                                                    : `+${Math.abs(result.co2_saving_kg_day)} kg`,
-                                                color: result.co2_saving_kg_day > 0 ? '#1A7A4A' : '#C0392B',
+                                                value: formatSaving(result.co2_saving_kg_day),
+                                                color: savingColor(result.co2_saving_kg_day),
                                             },
                                             {
                                                 label: 'CO₂ Saving/Month',
-                                                value: result.co2_saving_kg_day > 0
-                                                    ? `-${result.co2_saving_kg_month} kg`
-                                                    : `+${Math.abs(result.co2_saving_kg_month)} kg`,
-                                                color: result.co2_saving_kg_day > 0 ? '#1A7A4A' : '#C0392B',
+                                                value: formatSaving(result.co2_saving_kg_month),
+                                                color: savingColor(result.co2_saving_kg_month),
                                             },
                                             {
-                                                label: 'Cost Saving/Month',
-                                                value: `LKR ${result.cost_saving_lkr_month.toLocaleString()}`,
-                                                color: '#C8932A',
+                                                label: 'Cost Change/Month',
+                                                value: formatCostChange(result.cost_saving_lkr_month),
+                                                color: result.cost_saving_lkr_month >= 0 ? '#C8932A' : '#C0392B',
                                             },
                                             {
-                                                label: 'Reduction %',
-                                                value: `${result.co2_saving_pct}%`,
-                                                color: result.co2_saving_pct > 0 ? '#1A7A4A' : '#C0392B',
+                                                label: 'CO₂ Impact',
+                                                value: formatSaving(result.co2_saving_pct, '%'),
+                                                color: savingColor(result.co2_saving_pct),
                                             },
                                         ].map(m => (
                                             <div key={m.label} style={{
@@ -281,14 +375,17 @@ export default function WhatIfSimulator({ formData }) {
                                                 </div>
                                                 <div style={{
                                                     fontSize: 18, fontWeight: 800, color: m.color,
-                                                    fontFamily: "'Poppins',sans-serif"
+                                                    fontFamily: "'Poppins',sans-serif",
                                                 }}>
                                                     {m.value}
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, fontSize: 12, color: '#5A6A7A', marginTop: 12 }}>
+                                    <div style={{
+                                        display: 'flex', alignItems: 'flex-start', gap: 6,
+                                        fontSize: 12, color: '#5A6A7A', marginTop: 12,
+                                    }}>
                                         <FileText size={14} style={{ marginTop: 2, flexShrink: 0 }} />
                                         <span>{result.description}</span>
                                     </div>
