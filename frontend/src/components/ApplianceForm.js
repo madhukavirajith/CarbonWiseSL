@@ -186,7 +186,7 @@ export default function ApplianceForm() {
         }
     };
 
-    if (loading) return <Loader message="Running AI models - XGBoost · SHAP · K-Means…" />;
+    if (loading) return <Loader message="Running AI models..." />;
 
     const steps = ['Household', 'Cooling & Heating', 'Appliances', 'Lighting & Other'];
 

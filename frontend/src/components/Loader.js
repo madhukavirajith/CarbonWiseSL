@@ -30,7 +30,7 @@ export default function Loader({ message = 'Calculating your carbon footprint...
                     fontSize: 16, fontWeight: 600, color: '#1B2A4A', marginBottom: 6,
                 }}>{message}</div>
                 <div style={{ fontSize: 13, color: '#8A9BB0' }}>
-                    Running XGBoost · SHAP · K-Means…
+                    Running AI models
                 </div>
             </div>
             {/* Animated dots */}

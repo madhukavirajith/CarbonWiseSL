@@ -133,7 +133,7 @@ export default function ResultsPage() {
                                 Your Carbon Footprint Results
                             </h1>
                             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.60)', lineHeight: 1.7, maxWidth: 480 }}>
-                                Analysed with XGBoost regression · SHAP explainability · K-Means clustering.
+                                Analysed with AI.
                                 Results use SLSEA 2024 emission factors and approved CEB May 2026 tariff rates.
                             </p>
                             <div style={{ marginTop: 18, display: 'flex', gap: 12, flexWrap: 'wrap' }} className="mobile-justify-center">
@@ -281,7 +281,7 @@ export default function ResultsPage() {
                                             {cluster?.cluster_name || '-'}
                                         </div>
                                         <div style={{ fontSize: 13, color: '#5A6A7A', lineHeight: 1.6 }}>
-                                            Your usage pattern was classified by K-Means AI into this household
+                                            Your usage pattern was classified by our AI into this household
                                             behaviour profile.
                                         </div>
                                     </div>
@@ -376,8 +376,8 @@ export default function ResultsPage() {
                 {activeTab === 'breakdown' && (
                     <div className="animate-fadeIn">
                         <Section
-                            title="SHAP Appliance Breakdown"
-                            subtitle="Powered by SHAP (SHapley Additive exPlanations) - showing each appliance's exact contribution to your predicted CO₂"
+                            title="Appliance Breakdown"
+                            subtitle="Showing each appliance's exact contribution to your predicted CO₂"
                         >
                             <ShapChart explanation={explanation} />
                         </Section>
@@ -389,7 +389,7 @@ export default function ResultsPage() {
                     <div className="animate-fadeIn">
                         <Section
                             title="Your Household Profile"
-                            subtitle="K-Means AI clustered your usage pattern and generated these personalised recommendations"
+                            subtitle="AI clustered your usage pattern and generated these personalised recommendations"
                         >
                             <ClusterCard cluster={cluster} />
                         </Section>
